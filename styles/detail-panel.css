@@ -1,0 +1,103 @@
+/* detail-panel.css: the detail panel (a header, then the subproject list on the left and the task list on the right). */
+
+/* The header sits above the two lists. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  /* Headings, lists and "nothing here" messages shared by both lists. */
+  & h2 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+    overflow-wrap: anywhere;
+
+    &:focus {
+      outline: none; /* the heading only gets focus from code, after a keyboard action */
+    }
+  }
+
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  & .empty {
+    opacity: 0.6;
+    margin: 0;
+  }
+}
+
+.detail-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+
+  & h1 {
+    font-size: 2rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.detail-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Subprojects: each is a button that looks like a plain row. */
+.subproject-list {
+  & button {
+    display: block;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    cursor: pointer;
+    user-select: none; /* double-clicking should not highlight the text */
+
+    &:hover {
+      background: color-mix(in srgb, CanvasText 8%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 1px;
+    }
+  }
+}
+
+/* Tasks: a check mark and a title. */
+.task-list {
+  & li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  & .check {
+    flex: none;
+  }
+
+  & .completed .label {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  /* Text for screen readers only. */
+  & .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

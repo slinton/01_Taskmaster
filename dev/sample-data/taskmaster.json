@@ -1,0 +1,132 @@
+{
+  "id": "root",
+  "name": "All Projects",
+  "description": "",
+  "archived": false,
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "tasks": [
+    {
+      "id": "t6",
+      "title": "Review all projects at the end of the month",
+      "description": "",
+      "completed": false,
+      "completedAt": null,
+      "createdAt": "2026-09-30T08:00:00.000Z",
+      "updatedAt": "2026-09-30T08:00:00.000Z"
+    }
+  ],
+  "children": [
+    {
+      "id": "orbit",
+      "name": "ORBIT Library",
+      "description": "Documentation and examples for the robotics program",
+      "archived": false,
+      "createdAt": "2026-09-01T09:00:00.000Z",
+      "updatedAt": "2026-09-15T17:30:00.000Z",
+      "tasks": [
+        {
+          "id": "t1",
+          "title": "Decide on the library versioning scheme",
+          "description": "",
+          "completed": true,
+          "completedAt": "2026-09-10T16:00:00.000Z",
+          "createdAt": "2026-09-01T09:30:00.000Z",
+          "updatedAt": "2026-09-10T16:00:00.000Z"
+        }
+      ],
+      "children": [
+        {
+          "id": "orbit-docs",
+          "name": "Documentation",
+          "description": "",
+          "archived": false,
+          "createdAt": "2026-09-02T09:00:00.000Z",
+          "updatedAt": "2026-09-02T09:00:00.000Z",
+          "tasks": [
+            {
+              "id": "t2",
+              "title": "Write the getting-started page",
+              "description": "Keep it to one screen for students",
+              "completed": false,
+              "completedAt": null,
+              "createdAt": "2026-09-02T10:00:00.000Z",
+              "updatedAt": "2026-09-02T10:00:00.000Z"
+            },
+            {
+              "id": "t3",
+              "title": "Add wiring diagrams",
+              "description": "",
+              "completed": false,
+              "completedAt": null,
+              "createdAt": "2026-09-02T10:05:00.000Z",
+              "updatedAt": "2026-09-02T10:05:00.000Z"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "orbit-examples",
+          "name": "Examples",
+          "description": "",
+          "archived": false,
+          "createdAt": "2026-09-02T09:05:00.000Z",
+          "updatedAt": "2026-09-02T09:05:00.000Z",
+          "tasks": [],
+          "children": [
+            {
+              "id": "orbit-examples-sensors",
+              "name": "Sensor demos",
+              "description": "",
+              "archived": false,
+              "createdAt": "2026-09-03T09:00:00.000Z",
+              "updatedAt": "2026-09-03T09:00:00.000Z",
+              "tasks": [
+                {
+                  "id": "t4",
+                  "title": "Ultrasonic distance demo",
+                  "description": "",
+                  "completed": true,
+                  "completedAt": "2026-09-12T15:00:00.000Z",
+                  "createdAt": "2026-09-03T09:30:00.000Z",
+                  "updatedAt": "2026-09-12T15:00:00.000Z"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grading",
+      "name": "Grading Tools",
+      "description": "",
+      "archived": false,
+      "createdAt": "2026-09-05T12:00:00.000Z",
+      "updatedAt": "2026-09-05T12:00:00.000Z",
+      "tasks": [
+        {
+          "id": "t5",
+          "title": "Export grades to CSV",
+          "description": "",
+          "completed": false,
+          "completedAt": null,
+          "createdAt": "2026-09-05T12:30:00.000Z",
+          "updatedAt": "2026-09-05T12:30:00.000Z"
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "science-fair",
+      "name": "Old Science Fair",
+      "description": "Finished last spring",
+      "archived": true,
+      "createdAt": "2026-03-10T08:00:00.000Z",
+      "updatedAt": "2026-06-01T08:00:00.000Z",
+      "tasks": [],
+      "children": []
+    }
+  ]
+}

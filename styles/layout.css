@@ -1,0 +1,45 @@
+/* layout.css: the overall page layout (panels side by side). */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-body {
+  margin: 0;
+  padding: 1.5rem 0;
+  background: rgb(185, 185, 185);
+  font-family: system-ui, sans-serif;
+  height: 100vh;
+}
+
+.app {
+  display: grid;
+  /* Tree panel on the left (12rem up to 24rem, at most 40% of the window), detail panel on the right. */
+  grid-template-columns: minmax(12rem, min(24rem, 40%)) minmax(0, 1fr);
+  height: 100%;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0rem auto;
+  background: Canvas;
+  box-shadow: 0 2px 10px rgba(49, 44, 44, 0.08);
+}
+
+/* Each panel scrolls on its own if its contents are taller than the window. */
+.panel {
+  overflow: auto;
+  padding: 1rem;
+}
+
+.panel-tree {
+  border-right: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+}
+
+.placeholder {
+  opacity: 0.6;
+  margin: 0;
+}
+
+.spacer {
+  height: 0.5rem;
+}

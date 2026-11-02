@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Taskmaster test: history checks</title>
+  <link rel="stylesheet" href="tests.css">
+</head>
+<body>
+  <h1>History checks</h1>
+  <p id="summary"></p>
+  <ul id="results"></ul>
+
+  <script type="module">
+    import { runTests } from "./history-tests.js";
+
+    const results = runTests();
+    const list = document.getElementById("results");
+
+    for (const r of results) {
+      const li = document.createElement("li");
+      li.textContent = `${r.ok ? "PASS" : "FAIL"}: ${r.label}${r.ok ? "" : ` (${r.error})`}`;
+      li.style.color = r.ok ? "green" : "crimson";
+      list.appendChild(li);
+    }
+
+    const failed = results.filter((r) => !r.ok).length;
+    document.getElementById("summary").textContent =
+      `${results.length - failed} passed, ${failed} failed`;
+  </script>
+</body>
+</html>
