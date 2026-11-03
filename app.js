@@ -49,6 +49,8 @@ class App {
     });
     this.#detailView = new DetailView(detail, {
       onOpenSubproject: (id) => this.#select(id),
+      onAddSubproject: (name) => this.#addSubproject(name),
+      onAddTask: (title) => this.#addTask(title),
     });
 
     document.addEventListener("keydown", this.#handleKeydown);
@@ -89,8 +91,6 @@ class App {
    * project becomes the selected one. If it throws, the data is put back the way
    * it was. If it changes nothing, no undo step is recorded.
    *
-   * No edit in the app uses this yet.
-   *
    * @param {string} label - What the change is, e.g. "Rename project"
    * @param {function(Project): (Project|void)} change
    */
@@ -124,6 +124,26 @@ class App {
     }
 
     this.#render();
+  }
+
+  /**
+   * Add a subproject to the end of the selected project's subprojects. One undoable step.
+   * The change deliberately does not return the new project, so the selection stays on
+   * the parent and the user can keep adding. (Return it to select the new project.)
+   */
+  #addSubproject(name) {
+    const projectId = this.#selectedProjectId;
+    this.#apply("Add subproject", (root) => {
+      root.find(projectId).addChild(name);
+    });
+  }
+
+  /** Add a task to the end of the selected project's tasks. One undoable step. */
+  #addTask(title) {
+    const projectId = this.#selectedProjectId;
+    this.#apply("Add task", (root) => {
+      root.find(projectId).addTask(title);
+    });
   }
 
   /** Undo the most recent change. */
@@ -201,9 +221,15 @@ class App {
     return root.id;
   }
 
-  /** True if the user is typing in a text field. */
+  /**
+   * True if the user is typing in a text field, so the browser's own text undo
+   * should handle Ctrl+Z. An EMPTY field doesn't count: it has nothing to undo,
+   * and this lets Ctrl+Z undo the task just added while the add field has focus.
+   */
   static #isTyping(target) {
-    return Boolean(target?.isContentEditable) || ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName);
+    if (target?.isContentEditable) return true;
+    if (["INPUT", "TEXTAREA"].includes(target?.tagName)) return target.value !== "";
+    return target?.tagName === "SELECT";
   }
 
   /**
