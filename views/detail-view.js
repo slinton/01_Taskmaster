@@ -10,8 +10,11 @@
  *   const view = new DetailView(containerElement, { onOpenSubproject: (id) => { ... } });
  *   view.render(project);   // call again whenever anything changes
  *
- * onOpenSubproject is passed straight through from the subproject list: it is
- * called with a subproject's id when the user double-clicks it (or presses Enter).
+ * Both callbacks are passed straight through to the list views:
+ *  - onOpenSubproject is called with a subproject's id when the user double-clicks
+ *    it (or presses Enter).
+ *  - onAddSubproject is called with a name when the user adds a subproject to the selected project.
+ *  - onAddTask is called with a title when the user adds a task to the selected project.
  */
 
 import { SubprojectListView } from "./subproject-list-view.js";
@@ -27,8 +30,10 @@ export class DetailView {
    * @param {HTMLElement} container - Element the panel is drawn into
    * @param {object} [options]
    * @param {function} [options.onOpenSubproject] - Called with a subproject's id when it is opened
+   * @param {function} [options.onAddSubproject] - Called with a name when a subproject is added
+   * @param {function} [options.onAddTask] - Called with a title when a task is added
    */
-  constructor(container, { onOpenSubproject = () => {} } = {}) {
+  constructor(container, { onOpenSubproject = () => {}, onAddSubproject = () => {}, onAddTask = () => {} } = {}) {
     // The header: information about the selected project. More will go here later.
     this.#title = document.createElement("h1");
     const header = document.createElement("header");
@@ -53,8 +58,8 @@ export class DetailView {
     panel.append(header, body);
     container.replaceChildren(panel);
 
-    this.#subprojectView = new SubprojectListView(subprojects, { onOpen: onOpenSubproject });
-    this.#taskView = new TaskListView(tasks);
+    this.#subprojectView = new SubprojectListView(subprojects, { onOpen: onOpenSubproject, onAddSubproject });
+    this.#taskView = new TaskListView(tasks, { onAddTask });
   }
 
   /**
