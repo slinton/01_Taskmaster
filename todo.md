@@ -1,4 +1,2 @@
 # TO DO
-- Should treeview show tasks as well?
-- Undo able
-- Add code to Github
+- Move new subproject and new task to top of panel
