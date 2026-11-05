@@ -4,25 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Taskmaster</title>
+  <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/toolbar.css">
+  <link rel="stylesheet" href="styles/notice.css">
   <link rel="stylesheet" href="styles/tree-view.css">
   <link rel="stylesheet" href="styles/detail-panel.css">
-  <script type="module" src="app.js" defer></script>
 </head>
 <body class="app-body">
   <div class="app">
+    <header id="toolbar" class="toolbar"></header>
 
-    <!-- Tree view for projects -->
-    <nav class="panel panel-tree" aria-label="Projects">
-      <h1>Projects</h1>
-      <div class="spacer"></div>
+    <nav class="panel panel-tree" aria-label="Projects and tasks">
       <div id="tree" class="tree-view"></div>
     </nav>
 
-    <!-- Detail view for the selected project -->
-     <main class="panel panel-detail" id="detail"></main>
-
+    <main class="panel panel-detail" id="detail"></main>
   </div>
- 
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -5,9 +5,13 @@
  *
  * The view only displays and reports. Typing a title and pressing Enter (or
  * clicking Add) calls onAddTask with the title. The app adds the task and
- * redraws, and the field is ready for the next one.
+ * redraws, and the field is ready for the next one. Clicking the trash can
+ * beside a task calls onDelete with the task's id.
  *
- *   const view = new TaskListView(containerElement, { onAddTask: (title) => { ... } });
+ *   const view = new TaskListView(containerElement, {
+ *     onAddTask: (title) => { ... },
+ *     onDelete: (id) => { ... },
+ *   });
  *   view.render(project);   // call again whenever anything changes
  *
  * The heading, the list area and the add form are built once, when the view is
@@ -16,9 +20,12 @@
  * when a different project is shown, so it can't end up in the wrong project.
  */
 
+import { createDeleteButton } from "./icons.js";
+
 export class TaskListView {
   // Private fields: only code inside this class can use them.
   #onAddTask;
+  #onDelete;
   #items; // the area that holds the list (or the "No tasks." message)
   #input;
   #status; // screen reader announcements
@@ -28,15 +35,18 @@ export class TaskListView {
    * @param {HTMLElement} container - Element the list is drawn into
    * @param {object} [options]
    * @param {function} [options.onAddTask] - Called with the title when the user adds a task
+   * @param {function} [options.onDelete] - Called with a task's id when the user deletes it
    */
-  constructor(container, { onAddTask = () => {} } = {}) {
+  constructor(container, { onAddTask = () => {}, onDelete = () => {} } = {}) {
     this.#onAddTask = onAddTask;
+    this.#onDelete = onDelete;
 
     const heading = document.createElement("h2");
     heading.textContent = "Tasks";
 
     this.#items = document.createElement("div");
     this.#items.className = "task-items";
+    this.#items.addEventListener("click", this.#handleClick);
 
     this.#input = document.createElement("input");
     this.#input.type = "text";
@@ -107,6 +117,24 @@ export class TaskListView {
     this.#items.querySelector("li:last-child")?.scrollIntoView?.({ block: "nearest" });
   };
 
+  #handleClick = (event) => {
+    const button = event.target.closest("button.delete");
+    if (!button) return;
+    // The second click of a double-click would land on whatever row slid into place, so ignore it.
+    if (event.detail > 1) return;
+
+    const item = button.closest("li");
+    const title = item.querySelector(".label").textContent;
+    const index = [...this.#items.querySelectorAll("li")].indexOf(item);
+
+    this.#onDelete(item.dataset.id); // the app deletes it and redraws this view
+    this.#status.textContent = `Deleted task: ${title}`;
+
+    // Keep the keyboard user's place: focus the delete button that took its spot (or the one before it).
+    const remaining = [...this.#items.querySelectorAll("button.delete")];
+    (remaining[Math.min(index, remaining.length - 1)] ?? this.#input).focus();
+  };
+
   static #buildTask(task) {
     const item = document.createElement("li");
     item.dataset.id = task.id;
@@ -129,6 +157,8 @@ export class TaskListView {
       note.textContent = " (completed)";
       item.append(note);
     }
+
+    item.append(createDeleteButton(`Delete task "${task.title}"`));
 
     return item;
   }

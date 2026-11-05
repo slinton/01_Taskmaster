@@ -15,6 +15,7 @@
  *    it (or presses Enter).
  *  - onAddSubproject is called with a name when the user adds a subproject to the selected project.
  *  - onAddTask is called with a title when the user adds a task to the selected project.
+ *  - onDeleteSubproject and onDeleteTask are called with an id when the user clicks a trash can.
  */
 
 import { SubprojectListView } from "./subproject-list-view.js";
@@ -32,8 +33,19 @@ export class DetailView {
    * @param {function} [options.onOpenSubproject] - Called with a subproject's id when it is opened
    * @param {function} [options.onAddSubproject] - Called with a name when a subproject is added
    * @param {function} [options.onAddTask] - Called with a title when a task is added
+   * @param {function} [options.onDeleteSubproject] - Called with a subproject's id when it is deleted
+   * @param {function} [options.onDeleteTask] - Called with a task's id when it is deleted
    */
-  constructor(container, { onOpenSubproject = () => {}, onAddSubproject = () => {}, onAddTask = () => {} } = {}) {
+  constructor(
+    container,
+    {
+      onOpenSubproject = () => {},
+      onAddSubproject = () => {},
+      onAddTask = () => {},
+      onDeleteSubproject = () => {},
+      onDeleteTask = () => {},
+    } = {}
+  ) {
     // The header: information about the selected project. More will go here later.
     this.#title = document.createElement("h1");
     const header = document.createElement("header");
@@ -58,8 +70,12 @@ export class DetailView {
     panel.append(header, body);
     container.replaceChildren(panel);
 
-    this.#subprojectView = new SubprojectListView(subprojects, { onOpen: onOpenSubproject, onAddSubproject });
-    this.#taskView = new TaskListView(tasks, { onAddTask });
+    this.#subprojectView = new SubprojectListView(subprojects, {
+      onOpen: onOpenSubproject,
+      onAddSubproject,
+      onDelete: onDeleteSubproject,
+    });
+    this.#taskView = new TaskListView(tasks, { onAddTask, onDelete: onDeleteTask });
   }
 
   /**

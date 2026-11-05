@@ -1,36 +1,38 @@
+/* detail-panel.css: the detail panel (a header, then the subproject list on the left and the task list on the right). */
+
 .panel-detail {
   padding-bottom: 0; /* lets the add fields stick to the very bottom edge of the panel */
   scroll-padding-bottom: 4rem; /* when something is scrolled into view, leave room for those fields */
 }
- 
+
 /* The header sits above the two lists. */
 .detail {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
- 
+
   /* Headings, lists and "nothing here" messages shared by both lists. */
   & h2 {
     font-size: 1rem;
     margin: 0 0 0.5rem;
     overflow-wrap: anywhere;
- 
+
     &:focus {
       outline: none; /* the heading only gets focus from code, after a keyboard action */
     }
   }
- 
+
   & ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
- 
+
   & .empty {
     opacity: 0.6;
     margin: 0;
   }
- 
+
   /* The add-subproject and add-task fields stay at the bottom of the panel while a long list scrolls under them. */
   & .add-subproject,
   & .add-task {
@@ -41,20 +43,20 @@
     margin-top: 0.5rem;
     padding: 0.5rem 0;
     background: Canvas; /* opaque, so rows scrolling underneath don't show through */
- 
+
     & input {
       flex: 1;
       min-width: 0;
       font: inherit;
       padding: 0.35rem 0.5rem;
     }
- 
+
     & button {
       font: inherit;
       padding: 0.35rem 0.9rem;
     }
   }
- 
+
   /* Text for screen readers only. */
   & .visually-hidden {
     position: absolute;
@@ -65,31 +67,69 @@
     white-space: nowrap;
   }
 }
- 
+
 .detail-header {
   padding-bottom: 0.75rem;
   border-bottom: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
- 
+
   & h1 {
     font-size: 1.4rem;
     margin: 0;
     overflow-wrap: anywhere;
   }
 }
- 
+
 .detail-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   gap: 1.5rem;
   align-items: start;
 }
- 
-/* Subprojects: each is a button that looks like a plain row. (Only the ones in the list, not the Add button.) */
+
+/* The trash can beside a subproject or task. Faint until you point at the row or it has focus. */
+.detail li .delete {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.45;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    color: #b3261e;
+    background: color-mix(in srgb, #b3261e 12%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+}
+
+.detail li:hover .delete {
+  opacity: 1;
+}
+
+/* Subprojects: each is a button that looks like a plain row, with a trash can at the end. */
 .subproject-list {
-  
-  & li button {
-    display: block;
-    width: 100%;
+  & li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  & li button[data-id] {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
     font: inherit;
     color: inherit;
     text-align: left;
@@ -99,35 +139,39 @@
     padding: 0.2rem 0.4rem;
     cursor: pointer;
     user-select: none; /* double-clicking should not highlight the text */
- 
+
     &:hover {
       background: color-mix(in srgb, CanvasText 8%, transparent);
     }
- 
+
     &:focus-visible {
       outline: 2px solid Highlight;
       outline-offset: 1px;
     }
   }
 }
- 
+
 /* Tasks: a check mark and a title. */
 .task-list {
   & li {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.35rem;
     padding: 0.2rem 0.4rem;
   }
- 
+
   & .check {
     flex: none;
   }
- 
+
+  & .label {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   & .completed .label {
     text-decoration: line-through;
     opacity: 0.6;
   }
 }
- 
-Claude finished the response
