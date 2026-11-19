@@ -1,0 +1,24 @@
+#project-properties-view {
+    font: inherit;
+    background: canvas;
+    padding: 1rem;
+    grid-column: 1 / span 2;
+    border-bottom: solid 1px gray;
+
+    .breadcrumbs {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    button {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: transparent;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+    }
+
+}

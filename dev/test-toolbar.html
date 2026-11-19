@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Toolbar</title>
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+
+
+    <style>
+        #error-view {
+            font-size: 1rem;
+            color: red;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-body">
+        <h1>Test Toolbar</h1>
+        <div id="toolbar" class="toolbar"></div>
+        <div id="error-view"></div>
+    </div>
+
+    <script type="module">
+        import { Toolbar } from '../views/toolbar.js';
+
+        function runTest() {
+            const toolbar = new Toolbar('toolbar');
+            toolbar.render();
+        }
+
+        function showError(error) {
+            const errorView = document.querySelector('#error-view');
+            errorView.textContent = `Error: ${error.message}`;
+        }
+
+        runTest();
+
+    </script>
+</body>
+
+</html>

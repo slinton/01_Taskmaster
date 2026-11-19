@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Project Tree</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 1rem 5rem;
+            font-family: monospace
+        }
+
+        #project-view {
+            font-size: 1rem;
+        }
+        
+        hr {
+            margin: 1rem 0;
+            border: 1px solid #ccc;
+        }
+
+        #error-view {
+            font-size: 1rem;
+            color: red;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Project Tree</h1>
+    <div id="project-tree-view"></div>
+    <div id="error-view"></div>
+
+    <script type="module">
+        import { Project } from '../models/project.js';
+        import { Task } from '../models/task.js';
+        import { ProjectTree } from '../models/project-tree.js';
+
+        function runTest() {
+            const projectTree = createProjectTree();
+            //displayProjectTree(projectTree, '#project-tree-view');
+            const projectTreeJson = JSON.stringify(projectTree);
+            const restoredProjectTree = ProjectTree.fromJSON(projectTreeJson);
+            displayProjectTree(restoredProjectTree, '#project-tree-view');
+        }
+
+        function showError(error) {
+            const errorView = document.querySelector('#error-view');
+            errorView.textContent = `Error: ${error.message}`;
+        }
+
+        function createProjectTree() {
+            const rootProject = createProject();
+            const tree = new ProjectTree(rootProject);
+            return tree;
+        }
+
+        function createProject() {
+            const project = new Project('Home');
+            try {
+                project.addTask(new Task('Task 1'));
+                project.addTask(new Task('Task 2'));
+                project.addSubproject(new Project('Subproject 1'));
+                project.addSubproject(new Project('Subproject 2'));
+            } catch (error) {
+                console.error(error);
+                showError(error);
+                return;
+            }
+            return project;
+        }
+
+        function displayProjectTree(projectTree, container_id) {
+            const projectTreeView = document.querySelector(container_id);
+            projectTreeView.replaceChildren();
+            for (const [key, value] of Object.entries(projectTree)) {
+                const entry = document.createElement('div');
+                entry.textContent = `${key}: ${value}`;
+                projectTreeView.appendChild(entry);
+            }
+            projectTreeView.appendChild(document.createElement('hr'));
+            const jsonView = document.createElement('pre');
+            jsonView.textContent = JSON.stringify(projectTree, null, 2);
+            projectTreeView.appendChild(jsonView);
+        }
+
+        runTest();
+
+    </script>
+</body>
+
+</html>

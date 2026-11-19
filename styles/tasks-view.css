@@ -1,0 +1,45 @@
+#tasks-view {
+    font: inherit;
+    background: canvas;
+    padding: 1rem;
+
+    input[type="text"] {
+        background: rgb(230, 230, 230);
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+        border: solid 1px gray;
+        border-radius: 0.25rem;
+    }
+
+    .selected {
+        background: hsl(210, 100%, 76%);
+    }
+
+    .task {
+        display: flex;
+        align-items: center;
+
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        input[type="text"] {
+            height: 1.2rem;
+            background: transparent;
+            border-style: none;
+            width: 100%;
+            font-size: 1rem;
+            border: none;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+                background: hsl(210, 100%, 76%);
+            }
+        }
+    }
+
+}

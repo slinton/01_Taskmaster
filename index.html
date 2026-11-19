@@ -1,27 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Taskmaster</title>
-  <link rel="stylesheet" href="styles/base.css">
-  <link rel="stylesheet" href="styles/layout.css">
-  <link rel="stylesheet" href="styles/toolbar.css">
-  <link rel="stylesheet" href="styles/notice.css">
-  <link rel="stylesheet" href="styles/tree-view.css">
-  <link rel="stylesheet" href="styles/detail-panel.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskmaster</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/toolbar.css">
+    <link rel="stylesheet" href="styles/project-detail-view.css">
+    <link rel="stylesheet" href="styles/project-properties-view.css">
+    <link rel="stylesheet" href="styles/subprojects-view.css">
+    <link rel="stylesheet" href="styles/tasks-view.css">
+    <link rel="stylesheet" href="styles/project-tree-view.css">
+    <link rel="stylesheet" href="styles/message-view.css">
+
+    <script type="module" src="app.js" defer></script>
 </head>
-<body class="app-body">
-  <div class="app">
-    <header id="toolbar" class="toolbar"></header>
 
-    <nav class="panel panel-tree" aria-label="Projects and tasks">
-      <div id="tree" class="tree-view"></div>
-    </nav>
+<body>
+    <div class="app-body">
 
-    <main class="panel panel-detail" id="detail"></main>
-  </div>
+        <!-- Toolbar -->
+        <div id="toolbar" class="toolbar"></div>
 
-  <script type="module" src="app.js"></script>
+        <!-- Main Content -->
+        <div class="content">
+
+            <!-- ProjectTree View -->
+            <div id="project-tree-view"></div>
+
+            <!-- Project Detail View -->
+            <div id="project-detail-view">
+                <div id="project-properties-view"></div>
+
+                <!-- Subprojects View -->
+                <div id="subprojects-view"></div>
+
+                <!-- Tasks View -->
+                <div id="tasks-view"></div>
+            </div>
+
+        </div>
+
+        <!-- Error View -->
+        <div id="message-view"></div>
+
+    </div>
 </body>
+
 </html>

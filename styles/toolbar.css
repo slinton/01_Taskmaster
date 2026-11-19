@@ -1,24 +1,38 @@
-/* toolbar.css: the bar across the top of the app. */
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
-
-  & .brand {
-    font-weight: 600;
-  }
-
-  & .toolbar-buttons {
+#toolbar {
+    background: hsl(210, 100%, 56%);
+    padding: 0.5rem;
     display: flex;
-    gap: 0.5rem;
+    justify-content: right;
+    gap: 0.25rem;
 
-    & button {
-      font: inherit;
-      padding: 0.25rem 0.8rem;
+    .icon-button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: canvasText;
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .material-symbols-outlined {
+            font-size: 1.5rem;
+        }
+
+        &:hover {
+            background: hsl(210, 100%, 76%);
+        }
+
+        &:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 2px;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
     }
-  }
 }

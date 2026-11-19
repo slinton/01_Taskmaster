@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100dvh;
+    font-family: Arial, sans-serif;
+    background: rgb(145, 145, 145);
+}
+
+.app-body {
+    font: inherit;
+    background: canvas;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.content {
+    font: inherit;
+    display: flex;
+    height: 100%;
+    padding: 0rem;
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+}

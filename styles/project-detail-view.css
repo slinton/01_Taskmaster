@@ -1,0 +1,53 @@
+/* Project Detail View */
+#project-detail-view {
+    background: canvas;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: auto 1fr;
+    border-left: solid 1px gray;
+
+    .icon-button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: canvasText;
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .material-symbols-outlined {
+            font-size: 1.1rem;
+        }
+
+    }
+
+    .delete-button {
+        &:hover {
+            color: rgb(255, 0, 40);
+        }
+
+        &:focus-visible {
+            outline: 2px solid rgb(198, 40, 40);
+            outline-offset: 2px;
+        }
+    }
+
+    .items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .task,
+        .subproject {
+            border: solid 1px gray;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}

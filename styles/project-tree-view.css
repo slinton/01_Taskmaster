@@ -1,0 +1,54 @@
+#project-tree-view {
+    background: canvas;
+    /* border-left: solid 1px gray; */
+    padding: 1rem;
+
+    h1 {
+        margin-bottom: 0.75rem;
+    }
+
+    .project-node {
+        .project-row {
+            display: flex;
+            align-items: center;
+            gap: 0.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chevron {
+            font-size: 20px;
+            line-height: 1;
+            user-select: none;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+
+            &.placeholder {
+                visibility: hidden;
+                cursor: default;
+            }
+        }
+
+        .project-name {
+            line-height: 1;
+        }
+
+        .project-children {
+            display: none;
+            padding-left: 1rem;
+        }
+
+        &.expanded {
+            >.project-row .chevron {
+                transform: rotate(90deg);
+            }
+
+            >.project-children {
+                display: block;
+            }
+        }
+
+        .selected {
+            font-weight: bold;
+        }
+    }
+}

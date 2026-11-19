@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Project</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 1rem 5rem;
+            font-family: monospace
+        }
+
+        #project-view {
+            font-size: 1rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: 1px solid #ccc;
+        }
+
+        #error-view {
+            font-size: 1rem;
+            color: red;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Project</h1>
+    <div id="project-view"></div>
+    <div id="error-view"></div>
+
+    <script type="module">
+        import { Project } from '../models/project.js';
+        import { Task } from '../models/task.js';
+
+        function runTest() {
+            const project = createProject();
+            //displayProject(project, '#project-view');
+            const projectJson = JSON.stringify(project);
+            const restoredProject = Project.fromJSON(projectJson);
+            displayProject(restoredProject, '#project-view');
+        }
+
+        function showError(error) {
+            const errorView = document.querySelector('#error-view');
+            errorView.textContent = `Error: ${error.message}`;
+        }
+
+        function createProject() {
+            const project = new Project('Home');
+            try {
+                project.addTask(new Task('Task 1'));
+                project.addTask(new Task('Task 2'));
+                project.addSubproject(new Project('Subproject 1'));
+                project.addSubproject(new Project('Subproject 2'));
+            } catch (error) {
+                console.error(error);
+                showError(error);
+                return;
+            }
+            return project;
+        }
+
+        function displayProject(project, container_id) {
+            const projectView = document.querySelector(container_id);
+            projectView.replaceChildren();
+            for (const [key, value] of Object.entries(project)) {
+                const entry = document.createElement('div');
+                entry.textContent = `${key}: ${value}`;
+                projectView.appendChild(entry);
+            }
+            projectView.appendChild(document.createElement('hr'));
+            const jsonView = document.createElement('pre');
+            jsonView.textContent = JSON.stringify(project, null, 2);
+            projectView.appendChild(jsonView);
+        }
+
+        runTest();
+
+    </script>
+</body>
+
+</html>
