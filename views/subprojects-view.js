@@ -8,43 +8,43 @@ import { eventBus } from '../services/event-bus.js';
 export class SubprojectsView {
     constructor(containerId = 'subprojects-view') {
         // Subproject view element
-        this.container = document.querySelector(`#${containerId}`);
-        this.container.tabIndex = 0; // Make the container focusable for key events
-        this.container.addEventListener('keydown', (event) => {
+        this._container = document.querySelector(`#${containerId}`);
+        this._container.tabIndex = 0; // Make the container focusable for key events
+        this._container.addEventListener('keydown', (event) => {
             this.onKeyDown(event);
         });
 
         // Subproject data
-        this.project = null;
-        this.selectedSubproject = null;
-        this.selectedDiv = null;
+        this._project = null;
+        this._selectedSubproject = null;
+        this._selectedDiv = null;
 
         // Event bus for handling project-related events
-        eventBus.subscribe('project-selected', (project, _subscriber) => {
+        eventBus.subscribe('project-selected', (project, _publisher) => {
             //console.log(`SubprojectsView: Project selected:`, project);
-            this.project = project;
+            this._project = project;
             this.render();
         });
-        eventBus.subscribe('project-edited', (project, _subscriber) => {
+        eventBus.subscribe('project-edited', (project, _publisher) => {
             //console.log(`SubprojectsView: Project edited:`, project);
-            if (this.project && project === this.project) {
+            if (this._project && project === this._project) {
                 this.render();
             }
         });
-        eventBus.subscribe('project-tree-changed', (projectTree, _subscriber) => {
+        eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             //console.log(`SubprojectsView: Project tree changed:`, projectTree);
-            this.project = projectTree.selectedProject;
+            this._project = projectTree.selectedProject;
             this.render();
         });
     }
 
     // Handle key down events for subproject navigation and reordering
     onKeyDown(event) {
-        if (!this.project || !this.selectedSubproject) return;
-        const currentIndex = this.project.subprojects.indexOf(this.selectedSubproject);
+        if (!this._project || !this._selectedSubproject) return;
+        const currentIndex = this._project.subprojects.indexOf(this._selectedSubproject);
         if (event.key === 'ArrowUp' && currentIndex > 0) {
             this.handleArrowKey(event, currentIndex, currentIndex - 1);
-        } else if (event.key === 'ArrowDown' && currentIndex < this.project.subprojects.length - 1) {
+        } else if (event.key === 'ArrowDown' && currentIndex < this._project.subprojects.length - 1) {
             this.handleArrowKey(event, currentIndex, currentIndex + 1);
         }
     }
@@ -55,16 +55,16 @@ export class SubprojectsView {
         // Swap order of subprojects if Alt key is pressed
         if (event.altKey) {
             console.log('Alt key pressed with ArrowUp');
-            const subprojects = this.project.subprojects;
+            const subprojects = this._project.subprojects;
             [subprojects[currentIndex], subprojects[newIndex]] = [subprojects[newIndex], subprojects[currentIndex]];
-            eventBus.publish('project-edited', this.project, this);
+            eventBus.publish('project-edited', this._project, this);
         }
         // Move selection
         else {
-            this.selectedSubproject = this.project.subprojects[newIndex];
+            this._selectedSubproject = this._project.subprojects[newIndex];
             this.render();
         }
-        this.container.focus({ preventScroll: true });
+        this._container.focus({ preventScroll: true });
     }
 
     // Input to create a new subproject
@@ -75,27 +75,43 @@ export class SubprojectsView {
         newSubprojectInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter' && newSubprojectInput.value.trim() !== '') {
                 const newSubproject = new Project(newSubprojectInput.value.trim());
-                newSubproject.parent = this.project;
-                this.project.subprojects.push(newSubproject);
+                newSubproject.parent = this._project;
+                this._project.subprojects.push(newSubproject);
                 newSubprojectInput.value = '';
-                eventBus.publish('project-edited', this.project, this);
+                eventBus.publish('project-edited', this._project, this);
             }
         });
         return newSubprojectInput;
     }
 
+    createSubprojectNameInput(subproject) {
+        const subprojectNameInput = document.createElement('input');
+        subprojectNameInput.type = 'text';
+        subprojectNameInput.value = subproject.name;
+        subprojectNameInput.addEventListener('blur', () => {
+            subproject.name = subprojectNameInput.value;
+            eventBus.publish('project-edited', this._project, this);
+        });
+        subprojectNameInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                subprojectNameInput.blur();
+            }
+        });
+        return subprojectNameInput;
+    }
+
     // Delete button for a subproject
-    createDeleteButton(subproject, project) {
+    createDeleteButton(subproject) {
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
         deleteButton.className = 'icon-button delete-button';
         deleteButton.setAttribute('aria-label', 'Delete subproject');
         deleteButton.setAttribute('title', 'Delete subproject');
         deleteButton.addEventListener('click', () => {
-            const index = project.subprojects.indexOf(subproject);
+            const index = this._project.subprojects.indexOf(subproject);
             if (index > -1) {
-                project.subprojects.splice(index, 1);
-                eventBus.publish('project-edited', project, this);
+                this._project.subprojects.splice(index, 1);
+                eventBus.publish('project-edited', this._project, this);
             }
         });
         const deleteIcon = document.createElement('span');
@@ -107,31 +123,32 @@ export class SubprojectsView {
     }
 
     // Subproject information
-    createSubprojectDiv(subproject, project) {
+    createSubprojectDiv(subproject) {
         const subprojectDiv = document.createElement('div');
         subprojectDiv.className = 'subproject';
-        if (this.selectedSubproject === subproject) {
+        if (this._selectedSubproject === subproject) {
             subprojectDiv.classList.add('selected');
-            this.selectedDiv = subprojectDiv;
+            this._selectedDiv = subprojectDiv;
         }
         subprojectDiv.addEventListener('click', () => {
-            this.selectedSubproject = subproject;
-            if (this.selectedDiv) {
-                this.selectedDiv.classList.remove('selected');
+            this._selectedSubproject = subproject;
+            if (this._selectedDiv) {
+                this._selectedDiv.classList.remove('selected');
             }
-            this.selectedDiv = subprojectDiv;
+            this._selectedDiv = subprojectDiv;
             subprojectDiv.classList.toggle('selected', true);
+            subprojectNameInput.select();
         });
 
         subprojectDiv.addEventListener('dblclick', () => {
             eventBus.publish('project-selected', subproject, this);
         });
 
-        // Subproject name
-        subprojectDiv.appendChild(document.createTextNode(` ${subproject.name}`));
-
+        const subprojectNameInput = this.createSubprojectNameInput(subproject);
+        subprojectDiv.appendChild(subprojectNameInput);
+        
         // Delete button
-        const deleteButtonElement = this.createDeleteButton(subproject, project, this);
+        const deleteButtonElement = this.createDeleteButton(subproject);
         subprojectDiv.appendChild(deleteButtonElement);
 
         return subprojectDiv;
@@ -139,13 +156,12 @@ export class SubprojectsView {
 
     // List of subprojects
     createSubprojectList() {
-        // List of subprojects
         const itemsList = document.createElement('div');
         itemsList.className = 'items-list';
-        this.container.appendChild(itemsList);
+        this._container.appendChild(itemsList);
 
-        this.project.subprojects.forEach(subproject => {
-            const subprojectDiv = this.createSubprojectDiv(subproject, this.project);
+        this._project.subprojects.forEach(subproject => {
+            const subprojectDiv = this.createSubprojectDiv(subproject);
             itemsList.appendChild(subprojectDiv);
         });
         return itemsList;
@@ -154,27 +170,27 @@ export class SubprojectsView {
     // Render the subprojects view
     render() {
         console.log(`SubprojectsView: Rendering`);
-        this.container.replaceChildren();
+        this._container.replaceChildren();
 
         // Header
         const header = document.createElement('h2');
         header.textContent = 'Subprojects';
-        this.container.appendChild(header);
+        this._container.appendChild(header);
 
         // Empty project
-        if (!this.project) {
+        if (!this._project) {
             const noProjectMessage = document.createElement('p');
             noProjectMessage.textContent = 'No project selected';
-            this.container.appendChild(noProjectMessage);
+            this._container.appendChild(noProjectMessage);
             return;
         }
 
         // New subproject input
         const newSubprojectInput = this.createSubprojectInput();
-        this.container.appendChild(newSubprojectInput);
+        this._container.appendChild(newSubprojectInput);
 
         // List of subprojects
         const itemsList = this.createSubprojectList();
-        this.container.appendChild(itemsList);
+        this._container.appendChild(itemsList);
     }
 }

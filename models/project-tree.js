@@ -19,6 +19,7 @@ export class ProjectTree {
         return this._selectedProject;
     }
 
+    // Convert the ProjectTree instance to a plain object suitable for JSON serialization
     toJSON() {
         return {
             _rootProject: this._rootProject,
@@ -26,17 +27,9 @@ export class ProjectTree {
         };
     }
 
-    // static fromJSON(data) {
-    //     if (typeof data === "string") data = JSON.parse(data);
-    //     const root = Project.fromJSON(data._rootProject);
-    //     const tree = new ProjectTree(root);
-    //     tree._selectedProject = tree._findById(data._selectedProjectId) ?? root;
-    //     return tree;
-    // }
-
-    static fromJSONString(json) {
-        const data = typeof json === "string" ? JSON.parse(json) : json;
-        const root = Project.fromJSONString(data._rootProject);
+    // Convert form a plain object to a ProjectTree instance
+    static fromObject(data) {
+        const root = Project.fromObject(data._rootProject);
         const tree = new ProjectTree(root);
         tree._selectedProject = tree._findById(data._selectedProjectId) ?? root;
         return tree;

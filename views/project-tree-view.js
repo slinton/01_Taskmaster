@@ -10,52 +10,42 @@
 
 import { eventBus } from '../services/event-bus.js';
 import { Project } from '../models/project.js';
-import { Task } from '../models/task.js';
 
 export class ProjectTreeView {
     constructor(containerId = "project-tree-view", projectTree) {
-        // if (!projectTree) {
-        //     throw new Error('ProjectTree instance is required');
-        // }
-        this.projectTree = projectTree;
-        this.container = document.getElementById(containerId);
-        this.expandedProjects = new Set();
+        this._projectTree = projectTree;
+        this._container = document.getElementById(containerId);
+        this._expandedProjects = new Set();
 
-        // Survives re-renders, so expansion isn't lost when a project is selected
-        // if (!projectTree || !projectTree.rootProject) {
-        //     throw new Error('ProjectTree instance with a root project is required');
-        // }
-        // this.expandedProjects = new Set([projectTree.rootProject]);
-
-        eventBus.subscribe('project-selected', (project, _subscriber) => {
-            this.projectTree.selectedProject = project;
+        eventBus.subscribe('project-selected', (project, _publisher) => {
+            this._projectTree.selectedProject = project;
             this.render();
         });
-        eventBus.subscribe('project-edited', (_project, _subscriber) => {
+        eventBus.subscribe('project-edited', (_project, _publisher) => {
             this.render();
         });
-        eventBus.subscribe('project-tree-changed', (projectTree, _subscriber) => {
-            this.projectTree = projectTree;
-            this.expandedProjects.clear();
-            this.expandedProjects.add(projectTree.rootProject);
+        eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
+            this._projectTree = projectTree;
+            this._expandedProjects.clear();
+            this._expandedProjects.add(projectTree.rootProject);
             this.render();
         });
     }
 
     render() {
         console.log('ProjectTreeView: Rendering');
-        this.container.replaceChildren();
+        this._container.replaceChildren();
 
         const header = document.createElement('h1');
         header.textContent = 'Project Tree';
-        this.container.appendChild(header);
+        this._container.append(header);
 
-        if (!this.projectTree || !this.projectTree.rootProject) {
+        if (!this._projectTree || !this._projectTree.rootProject) {
             return;
         }
 
-        const ancestors = this.projectTree.selectedProject ? this.projectTree.selectedProject.getAncestors() : [];
-        this.container.appendChild(this.createProjectNode(this.projectTree.rootProject, ancestors));
+        const ancestors = this._projectTree.selectedProject ? this._projectTree.selectedProject.getAncestors() : [];
+        this._container.appendChild(this.createProjectNode(this._projectTree.rootProject, ancestors));
     }
 
     createProjectNode(project, ancestors) {
@@ -64,7 +54,7 @@ export class ProjectTreeView {
         // Create a container for the project node
         const node = document.createElement('div');
         node.className = 'project-node';
-        node.classList.toggle('expanded', this.expandedProjects.has(project) || ancestors.includes(project));
+        node.classList.toggle('expanded', this._expandedProjects.has(project) || ancestors.includes(project));
 
         // Row: chevron + name
         const row = document.createElement('div');
@@ -80,9 +70,9 @@ export class ProjectTreeView {
             chevron.addEventListener('click', () => {
                 const isExpanded = node.classList.toggle('expanded');
                 if (isExpanded) {
-                    this.expandedProjects.add(project);
+                    this._expandedProjects.add(project);
                 } else {
-                    this.expandedProjects.delete(project);
+                    this._expandedProjects.delete(project);
                 }
             });
         } else {
@@ -93,16 +83,16 @@ export class ProjectTreeView {
         const projectName = document.createElement('span');
         projectName.className = 'project-name';
         projectName.addEventListener('click', () => {
-            this.projectTree.selectedProject = project;
+            this._projectTree.selectedProject = project;
             eventBus.publish('project-selected', project, this);
         });
-        if (this.projectTree.selectedProject === project) {
+        if (this._projectTree.selectedProject === project) {
             projectName.classList.add('selected');
         }
         projectName.textContent = project.name;
 
         row.append(chevron, projectName);
-        node.appendChild(row);
+        node.append(row);
 
         // Children, built recursively
         if (hasChildren) {

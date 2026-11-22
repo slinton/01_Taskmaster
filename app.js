@@ -15,22 +15,23 @@ import { localStorageService } from "./services/local-storage-service.js";
 class App {
     constructor() {
         
-        this.toolbar = new Toolbar('toolbar', this.projectTree);
-        this.projectTreeView = new ProjectTreeView('project-tree-view', this.projectTree);
-        this.projectPropertiesView = new ProjectPropertiesView('project-properties-view');
-        this.subprojectsView = new SubprojectsView('subprojects-view');
-        this.tasksView = new TasksView('tasks-view');
-        this.messageView = new MessageView('message-view');
+        this._toolbar = new Toolbar('toolbar', this.projectTree);
+        this._projectTreeView = new ProjectTreeView('project-tree-view', this.projectTree);
+        this._projectPropertiesView = new ProjectPropertiesView('project-properties-view');
+        this._subprojectsView = new SubprojectsView('subprojects-view');
+        this._tasksView = new TasksView('tasks-view');
+        this._messageView = new MessageView('message-view');
 
         // Read tree from local storage if it exists
         const savedTree = localStorageService.read();
         if (savedTree) {
             this.projectTree = savedTree;
+            eventBus.publish('message', 'Project tree loaded from local storage', this);
         } else {
             const rootProject = this.createProject();
             this.projectTree = new ProjectTree(rootProject);
+            eventBus.publish('message', 'Project tree initialized with default project', this);
         }
-
 
         eventBus.publish('project-tree-changed', this.projectTree, this);
     }
@@ -46,7 +47,7 @@ class App {
             }
         } catch (error) {
             console.error(error);
-            this.messageView.showMessage(error);
+            this._messageView.showMessage(error);
             return;
         }
         return project;
@@ -54,7 +55,7 @@ class App {
 
     start() {
         console.log("App started");
-        eventBus.publish('message', 'App started', this);
+        //eventBus.publish('message', 'App started', this);
     }
 }
 

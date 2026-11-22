@@ -1,5 +1,14 @@
 import { Task } from "./task.js";
 
+export const ProjectState = Object.freeze({
+    NOT_STARTED: 'Not Started',
+    ACTIVE: 'Active',
+    PAUSED: 'Paused',
+    COMPLETED: 'Completed',
+    ARCHIVED: 'Archived',
+    IDEA: 'Idea'
+});
+
 export class Project {
     constructor(
         name, parent = null, id = crypto.randomUUID()) {
@@ -8,6 +17,7 @@ export class Project {
         this._id = id;
         this._subprojects = [];
         this._tasks = [];
+        this._state = ProjectState.NOT_STARTED;
     }
 
     get name() {
@@ -38,31 +48,29 @@ export class Project {
         return this._subprojects;
     }
 
+    get state() {
+        return this._state;
+    }
+
+    set state(state) {
+        this._state = state;
+    }
+
+    // Convert the Project instance to a plain object suitable for JSON serialization
     toJSON() {
         const { _parent, ...rest } = this;
         return rest;
     }
 
-    // static fromJSON(data, parent = null) {
-    //     if (typeof data === "string") data = JSON.parse(data);
-    //     const { _subprojects = [], _tasks = [], ...fields } = data;
-    //     const project = new Project(fields._name, parent);
-    //     Object.assign(project, fields);
-    //     project._subprojects = _subprojects.map(
-    //         child => Project.fromJSON(child, project)
-    //     );
-    //     project._tasks = _tasks.map(task => Task.fromJSON(task));
-    //     return project;
-    // }
-
-    static fromJSONString(data, parent = null) {
+    // Convert from a plain object to a Project instance, including its subprojects and tasks
+    static fromObject(data, parent = null) {
         const { _subprojects = [], _tasks = [], ...fields } = data;
         const project = new Project(fields._name, parent);
         Object.assign(project, fields);
         project._subprojects = _subprojects.map(
-            child => Project.fromJSONString(child, project)
+            child => Project.fromObject(child, project)
         );
-        project._tasks = _tasks.map(task => Task.fromJSON(task));
+        project._tasks = _tasks.map(task => Task.fromObject(task));
         return project;
     }
 
@@ -93,5 +101,33 @@ export class Project {
             current = current._parent;
         }
         return ancestors;
+    }
+
+    hasImmediateTasks() {
+        return this._tasks.length > 0;
+    }
+
+    // Get count of all tasks in this project and its descendant subprojects
+    getTaskCount() {
+        let count = this._tasks.length;
+        for (const subproject of this._subprojects) {
+            count += subproject.getTaskCount();
+        }
+        return count;
+    }
+
+    // Get count of all complete tasks in this project and its descendant subprojects
+    getCompleteTaskCount() {
+        let count = this._tasks.filter(task => task.completed).length;
+        for (const subproject of this._subprojects) {
+            count += subproject.getCompleteTaskCount();
+        }
+        return count;
+    }
+
+    getCompletionDescription() {
+        const total = this.getTaskCount();
+        const complete = this.getCompleteTaskCount();
+        return `${complete} of ${total} tasks complete`;
     }
 }   

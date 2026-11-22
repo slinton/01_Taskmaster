@@ -1,15 +1,10 @@
 import { ProjectTree } from '../models/project-tree.js';
+import { eventBus } from './event-bus.js';
 
 const STORAGE_KEY = "projectTree";
 const SCHEMA_VERSION = 1;
 
 export class LocalStorageService {
-	// static #instance = null;
-
-	// static get instance() {
-	// 	return (LocalStorageService.#instance ??= new LocalStorageService());
-	// }
-
 	write(projectTree) {
 		if (projectTree == null) return this.clear();
 		try {
@@ -18,9 +13,11 @@ export class LocalStorageService {
 				data: projectTree,
 			};
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+			eventBus.publish('message', 'Local storage write successful', this);
 			return true;
 		} catch {
 			console.warn("LocalStorageService: write failed");
+			eventBus.publish('message', 'Local storage write failed', this);
 			return false;
 		}
 	}
@@ -32,11 +29,14 @@ export class LocalStorageService {
 			const { schemaVersion, data } = JSON.parse(raw);
 			if (schemaVersion !== SCHEMA_VERSION) {
 				console.warn("LocalStorageService: schema version mismatch");
+				eventBus.publish('message', 'Local storage schema version mismatch', this);
 				return null;
 			}
-			return ProjectTree.fromJSONString(data);
+			eventBus.publish('message', 'Local storage read successful', this);
+			return ProjectTree.fromObject(data);
 		} catch {
 			console.warn("LocalStorageService: read failed");
+			eventBus.publish('message', 'Local storage read failed', this);
 			return null;
 		}
 	}

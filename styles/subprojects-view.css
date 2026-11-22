@@ -19,20 +19,24 @@
         background: hsl(210, 100%, 76%);
     }
 
-    /* .subproject-span {
+    .subproject {
+        display: flex;
+        align-items: center;
+
         input[type="text"] {
-            font-size: 1rem;
+            height: 1.2rem;
             background: transparent;
             border-style: none;
-            padding: 0.25rem;
+            width: 100%;
+            font-size: 1rem;
+            border: none;
+            margin: 0;
 
-            &:active {
+            &:focus {
+                outline: none;
                 background: hsl(210, 100%, 76%);
             }
-        } */
-
+        }
     }
 
-    
 }
-

@@ -5,14 +5,14 @@ import { eventBus } from "../services/event-bus.js";
 
 export class MessageView {
     constructor(containerId = "message-view") {
-        this.container = document.getElementById(containerId);
-        eventBus.subscribe('message', (message, _subscriber) => {
+        this._container = document.getElementById(containerId);
+        eventBus.subscribe('message', (message, _publisher) => {
             this.showMessage(message);
         });
     }
 
     showMessage(message) {
         const msg = message;
-        this.container.textContent = msg;
+        this._container.textContent = msg;
     }
 }

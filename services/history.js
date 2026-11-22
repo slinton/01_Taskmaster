@@ -1,52 +1,64 @@
 //
 // History service for managing undo and redo operations on the project tree.
+// Changes are saved locally and on local storage.
 //
 import { eventBus } from '../services/event-bus.js';
 import { ProjectTree } from '../models/project-tree.js';
+import { localStorageService } from './local-storage-service.js';
 
 export class History {
-    // static #instance = null;
 
     constructor() {
-        // if (History.#instance) {
-        //     return History.#instance;
-        // }
-        this.projectTree = null
-        this.stack = [];
-        this.index = -1; // index of current state
+        this._projectTree = null
+        this._stack = [];
+        this._index = -1; // index of current state
+        this._isUnsaved = false;
+       
+        eventBus.subscribe('project-tree-changed', (projectTree, publisher) => {
+            if (this === publisher) return;
+            this._projectTree = projectTree;
+            this.push();
+        });
+        eventBus.subscribe('project-edited', (_project, publisher) => {
+            if (this === publisher) return;
+            this.push();
+        });
+        // TODO: reconsider how this works
+        eventBus.subscribe('saved_to_db', (_success, publisher) => {
+            if (this === publisher) return;
+            this._isUnsaved = false;
+        });
+    }
 
-        eventBus.subscribe('project-tree-changed', (projectTree, subscriber) => {
-            if (this === subscriber) return;
-            this.projectTree = projectTree;
-            this.push();
-        });
-        eventBus.subscribe('project-edited', (_project, _subscriber) => {
-            this.push();
-        });
-        eventBus.subscribe('task-edited', (_task, _subscriber) => {
-            this.push();
-        });
+    get isUnsaved() {
+        return this._isUnsaved;
+    }
 
+    set isUnsaved(value) {
+        this._isUnsaved = value;
     }
 
     push() {
-        if (this.projectTree) {
+        if (this._projectTree) {
             // Remove any redo states beyond the current index
-            this.stack = this.stack.slice(0, this.index + 1);
-            const state = JSON.stringify(this.projectTree ?? null);
+            this._stack = this._stack.slice(0, this._index + 1);
+            const state = JSON.stringify(this._projectTree ?? null);
 
             // Skip if nothing changed since the current state
-            if (this.index >= 0 &&
-                JSON.stringify(state) === JSON.stringify(this.stack[this.index])) {
-                console.log(`****History: No changes detected! index = ${this.index}`);
+            if (this._index >= 0 &&
+                JSON.stringify(state) === JSON.stringify(this._stack[this._index])) {
+                console.log(`****History: No changes detected! index = ${this._index}`);
                 eventBus.publish('error', 'No changes detected in history push.');
                 this.printStack();
                 return; // exit early if no changes detected
             }
 
-            this.stack.push(state);
-            this.index++;
-            eventBus.publish('history-changed', this.index, this);
+            this._stack.push(state);
+            this._index++;
+            eventBus.publish('history-changed', this._index, this);
+            // TODO: make localStorage service stand-alone
+            localStorageService.write(this._projectTree);
+            this._isUnsaved = true;
         }
         else {
             console.log(`****History: No project tree available to push.`);
@@ -54,20 +66,20 @@ export class History {
     }
 
     canUndo() {
-        return this.index > 0;
+        return this._index > 0;
     }
 
     canRedo() {
-        return this.index < this.stack.length - 1;
+        return this._index < this._stack.length - 1;
     }
 
     undo() {
-        if (this.index > 0) {
-            this.index--; // move back to previous state
-            const state = this.stack[this.index]; // last saved state
-            this.projectTree = ProjectTree.fromJSONString(state);
-            eventBus.publish('project-tree-changed', this.projectTree, this);
-            eventBus.publish('history-changed', this.index, this);
+        if (this._index > 0) {
+            this._index--; // move back to previous state
+            const state = this._stack[this._index]; // last saved state
+            this._projectTree = ProjectTree.fromObject(JSON.parse(state));
+            eventBus.publish('project-tree-changed', this._projectTree, this);
+            eventBus.publish('history-changed', this._index, this);
         }
         else {
             console.log(`****History: Cannot undo, already at the earliest state.`);
@@ -75,12 +87,12 @@ export class History {
     }
 
     redo() {
-        if (this.index < this.stack.length - 1) {
-            this.index++; // move forward to the next state
-            const state = this.stack[this.index];
-            this.projectTree = ProjectTree.fromJSONString(state);
-            eventBus.publish('project-tree-changed', this.projectTree, this);
-            eventBus.publish('history-changed', this.index, this);
+        if (this._index < this._stack.length - 1) {
+            this._index++; // move forward to the next state
+            const state = this._stack[this._index];
+            this._projectTree = ProjectTree.fromObject(JSON.parse(state));
+            eventBus.publish('project-tree-changed', this._projectTree, this);
+            eventBus.publish('history-changed', this._index, this);
         }
         else {
             console.log(`****History: Cannot redo, already at the latest state.`);
@@ -89,11 +101,11 @@ export class History {
 
     printStack() {
         console.log(`\n\n*****History: Printing stack *****`);
-        console.log(`History: Stack size: ${this.stack.length}. Current index: ${this.index}`);
-        this.stack.forEach((state, index) => {
+        console.log(`History: Stack size: ${this._stack.length}. Current index: ${this._index}`);
+        this._stack.forEach((state, index) => {
             console.log(`History: Stack[${index}]:`, state);
         });
-        console.log('History size:', this.stack.length);
+        console.log('History size:', this._stack.length);
     }
 }
 

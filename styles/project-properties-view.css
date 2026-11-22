@@ -21,4 +21,38 @@
         padding: 0;
     }
 
+    .completion-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+    }
+
+    meter {
+        height: 2rem;
+        border-radius: 0rem;
+    }
+
+    .state-display {
+        /* background: rebeccapurple; */
+        display: flex;
+        align-items: center;
+        
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+
+        span {
+            margin-top: 0.5rem;
+        }
+    }
+
+    select {
+        font: inherit;
+        background: canvas;
+        border: solid 1px gray;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        margin-top: 0.5rem;
+    }
+
 }

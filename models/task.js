@@ -26,8 +26,8 @@ export class Task {
         this._completed = value;
     }
 
-    static fromJSON(data) {
-        if (typeof data === "string") data = JSON.parse(data);
+    // Convert from a plain object to a Task instance
+    static fromObject(data) {
         const task = new Task(data._name, data._id);
         task._completed = data._completed ?? false;
         return task;

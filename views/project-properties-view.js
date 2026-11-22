@@ -1,24 +1,30 @@
 //
 // View for overall project properties
 //
+import { ProjectState } from '../models/project.js';
 import { Project } from '../models/project.js';
 import { eventBus } from '../services/event-bus.js';
 
 
 export class ProjectPropertiesView {
     constructor(containerId = 'project-properties-view') {
-        this.project = null;
-        this.container = document.querySelector(`#${containerId}`);
+        this._project = null;
+        this._container = document.querySelector(`#${containerId}`);
 
-        eventBus.subscribe('project-selected', (project, _subscriber) => {
+        eventBus.subscribe('project-selected', (project, _publisher) => {
             //console.log(`ProjectPropertiesView: Project selected:`, project);
-            this.project = project;
+            this._project = project;
             this.render();
         });
-        eventBus.subscribe('project-tree-changed', (projectTree, _subscriber) => {
+        eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             //console.log(`ProjectPropertiesView: Project tree changed:`, projectTree);
-            this.project = projectTree.selectedProject;
+            this._project = projectTree.selectedProject;
             this.render();
+        });
+        eventBus.subscribe('project-edited', (project, _publisher) => {
+            if (this._project && this._project === project) {
+                this.render();
+            }
         });
     }
 
@@ -26,7 +32,7 @@ export class ProjectPropertiesView {
     createBreadcrumbs() {
         const breadcrumbs = document.createElement('div');
         breadcrumbs.classList.add('breadcrumbs');
-        const ancestors = this.project ? this.project.getAncestors() : [];
+        const ancestors = this._project ? this._project.getAncestors() : [];
         for (const ancestor of ancestors) {
             const projectButton = document.createElement('button');
             projectButton.textContent = ancestor.name;
@@ -43,25 +49,90 @@ export class ProjectPropertiesView {
         return breadcrumbs;
     }
 
+    createCompletionDisplay() {
+        const display = document.createElement('div');
+        display.classList.add('completion-display');
+
+        const label = document.createElement('span');
+        label.textContent = 'Completion:';
+        display.append(label);
+        display.append(this.createCompletionMeter());
+        display.append(this.createCompletionDescription());
+
+        return display;
+    }
+
+    createCompletionDescription() {
+        const description = document.createElement('p');
+        description.textContent = this._project ? this._project.getCompletionDescription() : '';
+        return description;
+    }
+
+    createCompletionMeter() {
+        const meter = document.createElement('meter');
+        if (this._project) {
+            meter.max = this._project.getTaskCount();
+            meter.value = this._project.getCompleteTaskCount();
+        }
+        return meter;
+    }
+
+    createStateDisplay() {
+        const stateDisplay = document.createElement('div');
+        stateDisplay.classList.add('state-display');
+
+        const label = document.createElement('span');
+        label.textContent = 'State:';
+        stateDisplay.append(label);
+
+        const dropdown = document.createElement('select');
+        if (this._project) {
+            const states = Object.values(ProjectState);
+            for (const state of states) {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                if (state === this._project.state) {
+                    option.selected = true;
+                }
+                dropdown.append(option);
+            }
+            dropdown.addEventListener('change', () => {
+                this._project.state = dropdown.value;
+                eventBus.publish('project-edited', this._project, this);
+            });
+        }
+        stateDisplay.append(dropdown);
+        return stateDisplay;
+    }
+
     // Render the project properties view
     render() {
         console.log(`ProjectPropertiesView: Rendering`);
-        this.container.replaceChildren();
+        this._container.replaceChildren();
+
+        // Empty project
+        if (!this._project) {
+            const noProjectMessage = document.createElement('p');
+            noProjectMessage.textContent = 'No project selected';
+            this._container.append(noProjectMessage);
+            return;
+        }
 
         // Breadcrumbs
-        this.container.append(this.createBreadcrumbs());
+        this._container.append(this.createBreadcrumbs());
 
         // Header
         const header = document.createElement('h1');
-        header.textContent = `Project: ${this.project ? this.project.name : 'NA'}`
-        this.container.append(header);
+        header.textContent = `Project: ${this._project ? this._project.name : 'NA'}`
+        this._container.append(header);
 
-        // Empty project
-        if (!this.project) {
-            const noProjectMessage = document.createElement('p');
-            noProjectMessage.textContent = 'No project selected';
-            this.container.append(noProjectMessage);
-            return;
+        if (this._project.hasImmediateTasks()) {
+            // Completion description
+            this._container.append(this.createCompletionDisplay());
+
+            // State dropdown
+            this._container.append(this.createStateDisplay());
         }
     }
 }
