@@ -16,21 +16,13 @@ export class TasksView {
         });
 
         // Task data
+        this._projectTree = null;
         this._project = null;
         this._selectedTask = null;
         this._selectedDiv = null;
 
-        // Event bus for handling project and task events
-        eventBus.subscribe('project-selected', (project, _publisher) => {
-            this._project = project;
-            this.render();
-        });
-        eventBus.subscribe('project-edited', (project, _publisher) => {
-            if (this._project && this._project === project) {
-                this.render();
-            }
-        });
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
+            this._projectTree = projectTree;
             this._project = projectTree.selectedProject;
             this.render();
         });
@@ -55,7 +47,8 @@ export class TasksView {
             //console.log('Alt key pressed with ArrowUp');
             const tasks = this._project.tasks;
             [tasks[currentIndex], tasks[newIndex]] = [tasks[newIndex], tasks[currentIndex]];
-            eventBus.publish('project-edited', this._project, this);
+            // eventBus.publish('project-edited', this._project, this);
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         }
         // Move selection
         else {
@@ -75,7 +68,7 @@ export class TasksView {
                 const newTask = new Task(newTaskInput.value.trim());
                 this._project.tasks.push(newTask);
                 newTaskInput.value = '';
-                eventBus.publish('project-edited', this._project, this);
+                eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });
         return newTaskInput;
@@ -89,7 +82,8 @@ export class TasksView {
         taskCheckbox.addEventListener('change', () => {
             task.completed = taskCheckbox.checked;
             console.log(`Task "${task.name}" completion changed to ${task.completed}`);
-            eventBus.publish('project-edited', this._project, this);
+            // eventBus.publish('project-edited', this._project, this);
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         return taskCheckbox;
     }
@@ -104,7 +98,8 @@ export class TasksView {
         // });
         taskNameInput.addEventListener('blur', () => {
             task.name = taskNameInput.value;
-            eventBus.publish('project-edited', this._project, this);
+            // eventBus.publish('project-edited', this._project, this);
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         taskNameInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
@@ -126,7 +121,8 @@ export class TasksView {
             const index = this._project.tasks.indexOf(task);
             if (index > -1) {
                 this._project.tasks.splice(index, 1);
-                eventBus.publish('project-edited', this._project, this);
+                // eventBus.publish('project-edited', this._project, this);
+                eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });
         const deleteIcon = document.createElement('span');

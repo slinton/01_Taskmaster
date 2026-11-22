@@ -15,24 +15,26 @@ export class SubprojectsView {
         });
 
         // Subproject data
+        this._projectTree = null;
         this._project = null;
         this._selectedSubproject = null;
         this._selectedDiv = null;
 
         // Event bus for handling project-related events
-        eventBus.subscribe('project-selected', (project, _publisher) => {
-            //console.log(`SubprojectsView: Project selected:`, project);
-            this._project = project;
-            this.render();
-        });
-        eventBus.subscribe('project-edited', (project, _publisher) => {
-            //console.log(`SubprojectsView: Project edited:`, project);
-            if (this._project && project === this._project) {
-                this.render();
-            }
-        });
+        // eventBus.subscribe('project-selected', (project, _publisher) => {
+        //     //console.log(`SubprojectsView: Project selected:`, project);
+        //     this._project = project;
+        //     this.render();
+        // });
+        // eventBus.subscribe('project-edited', (project, _publisher) => {
+        //     //console.log(`SubprojectsView: Project edited:`, project);
+        //     if (this._project && project === this._project) {
+        //         this.render();
+        //     }
+        // });
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             //console.log(`SubprojectsView: Project tree changed:`, projectTree);
+            this._projectTree = projectTree;
             this._project = projectTree.selectedProject;
             this.render();
         });
@@ -57,7 +59,8 @@ export class SubprojectsView {
             console.log('Alt key pressed with ArrowUp');
             const subprojects = this._project.subprojects;
             [subprojects[currentIndex], subprojects[newIndex]] = [subprojects[newIndex], subprojects[currentIndex]];
-            eventBus.publish('project-edited', this._project, this);
+            // eventBus.publish('project-edited', this._project, this);
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         }
         // Move selection
         else {
@@ -78,7 +81,8 @@ export class SubprojectsView {
                 newSubproject.parent = this._project;
                 this._project.subprojects.push(newSubproject);
                 newSubprojectInput.value = '';
-                eventBus.publish('project-edited', this._project, this);
+                // eventBus.publish('project-edited', this._project, this);
+                eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });
         return newSubprojectInput;
@@ -90,7 +94,8 @@ export class SubprojectsView {
         subprojectNameInput.value = subproject.name;
         subprojectNameInput.addEventListener('blur', () => {
             subproject.name = subprojectNameInput.value;
-            eventBus.publish('project-edited', this._project, this);
+            // eventBus.publish('project-edited', this._project, this);
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         subprojectNameInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
@@ -111,7 +116,8 @@ export class SubprojectsView {
             const index = this._project.subprojects.indexOf(subproject);
             if (index > -1) {
                 this._project.subprojects.splice(index, 1);
-                eventBus.publish('project-edited', this._project, this);
+                // eventBus.publish('project-edited', this._project, this);
+                eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });
         const deleteIcon = document.createElement('span');
@@ -141,7 +147,8 @@ export class SubprojectsView {
         });
 
         subprojectDiv.addEventListener('dblclick', () => {
-            eventBus.publish('project-selected', subproject, this);
+            this._projectTree.selectedProject = subproject;
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         });
 
         const subprojectNameInput = this.createSubprojectNameInput(subproject);
