@@ -5,7 +5,6 @@ export class PasswordView {
     }
 
     render() {
-        
         const passwordLabel = document.createElement('label');
         passwordLabel.textContent = 'Password: ';
         this._container.appendChild(passwordLabel);

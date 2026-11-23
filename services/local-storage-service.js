@@ -5,52 +5,44 @@ const STORAGE_KEY = "projectTree";
 const SCHEMA_VERSION = 1;
 
 export class LocalStorageService {
-	 constructor() {
-        this._projectTree = null;
-        
-		// Auto-save on project tree changes
-        eventBus.subscribe('project-tree-changed', (projectTree, publisher) => {
-			console.log(`LocalStorageService: project-tree-changed event received`);
-            if (this === publisher) return;
-			console.log(`LocalStorageService: projectTree =`, projectTree);
-            this._projectTree = projectTree;
-            this.write();
-        });
-    }
 
-	write() {
-		if (this._projectTree == null) return this.clear();
+	write(projectTree) {
+		if (projectTree == null) return false;
+		
 		try {
 			const payload = {
 				schemaVersion: SCHEMA_VERSION,
-				data: this._projectTree,
+				data: projectTree,
 			};
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-			// eventBus.publish('message', 'Local storage write successful', this);
+			console.log("LocalStorageService: write successful");
+			eventBus.publish('message', 'Wrote project tree to local storage.');
 			return true;
 		} catch {
 			console.warn("LocalStorageService: write failed");
-			eventBus.publish('message', 'Local storage write failed', this);
+			eventBus.publish('message', 'Failed to write project tree to local storage.');
 			return false;
 		}
 	}
 
+	
 	read() {
 		try {
 			const raw = localStorage.getItem(STORAGE_KEY);
 			if (raw == null) return null;
+
 			const { schemaVersion, data } = JSON.parse(raw);
 			if (schemaVersion !== SCHEMA_VERSION) {
 				console.warn("LocalStorageService: schema version mismatch");
-				eventBus.publish('message', 'Local storage schema version mismatch', this);
+				eventBus.publish('message', 'Schema version mismatch in local storage.');
 				return null;
 			}
 			this._projectTree = ProjectTree.fromObject(data);
-			eventBus.publish('message', 'Local storage read successful', this);
+			eventBus.publish('message', 'Read project tree from local storage.');
 			return this._projectTree;
 		} catch {
 			console.warn("LocalStorageService: read failed");
-			eventBus.publish('message', 'Local storage read failed', this);
+			eventBus.publish('message', 'Failed to read project tree from local storage.');
 			return null;
 		}
 	}

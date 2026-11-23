@@ -3,7 +3,6 @@
 //
 import { ProjectTree } from '../models/project-tree.js';
 import { eventBus } from './event-bus.js';
-import { localStorageService } from './local-storage-service.js';
 
 const DB_URL = 'https://taskmaster-data-default-rtdb.firebaseio.com';
 const DB_PATH = 'appdata';
@@ -11,21 +10,9 @@ const ENDPOINT = `${DB_URL}/${DB_PATH}.json`;
 const SCHEMA_VERSION = 1;
 
 export class FirebaseService {
-    constructor() {
-        this._needsSave = false;
-
-        eventBus.subscribe('project-tree-changed', (_projectTree, publisher) => {
-            if (publisher === this) return;
-            this._needsSave = true;
-        });
-    }
-
-    get needsSave() {
-        return this._needsSave;
-    }
 
     async write(projectTree) {
-        if (projectTree == null) return this.clear();
+        if (projectTree == null) return false;
         try {
             // The envelope is stored as a JSON *string* on purpose. Realtime
             // Database drops empty arrays and reshapes sparse ones, so storing
@@ -36,13 +23,12 @@ export class FirebaseService {
                 body: JSON.stringify(envelope)
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            this._needsSave = false;
-            eventBus.publish('project-tree-saved', projectTree, this);
-            eventBus.publish('message', 'Data written to Firebase', this);
+            console.log('FirebaseService: Wrote project tree to Firebase.');
+            eventBus.publish('message', 'Wrote project tree to Firebase.');
             return true;
         } catch (error) {
             console.warn('FirebaseService: write failed', error);
-            eventBus.publish('message', 'Failed to write data to Firebase!', this);
+            eventBus.publish('message', 'Failed to write project tree to Firebase.');
             return false;
         }
     }
@@ -51,17 +37,18 @@ export class FirebaseService {
         try {
             const res = await fetch(ENDPOINT);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
             const raw = await res.json();
-            if (raw == null) return new Error('No data found in Firebase');
+            if (raw == null) return new Error('No project tree found in Firebase');
+
             const parsed = JSON.parse(raw);
-            const projectTree = ProjectTree.fromObject(parsed.data);
-            eventBus.publish('message', 'Data read from Firebase', this);
-            localStorageService.write(projectTree);
-            this._needsSave = false;
-            return projectTree;
+            console.log('FirebaseService: Read project tree from Firebase:');
+            eventBus.publish('message', 'Read project tree from Firebase.');
+            return ProjectTree.fromObject(parsed.data);
+           
         } catch (error) {
             console.warn('FirebaseService: read failed', error);
-            eventBus.publish('message', 'Failed to read data from Firebase!', this);
+            eventBus.publish('message', 'Failed to read project tree from Firebase.');
             return null;
         }
     }

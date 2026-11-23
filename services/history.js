@@ -25,17 +25,17 @@ export class History {
             this._stack = this._stack.slice(0, this._index + 1);
             const state = JSON.stringify(this._projectTree ?? null);
 
-            // Skip if nothing changed since the current state
+            // Skip if new state is unchanged
             if (this._index >= 0 &&
                 JSON.stringify(state) === JSON.stringify(this._stack[this._index])) {
-                console.log(`****History: No changes detected! index = ${this._index}`);
-                eventBus.publish('error', 'No changes detected in history push.');
-                this.printStack();
-                return; // exit early if no changes detected
+                console.log(`History:push No Changes; index = ${this._index}`);
+                // this.printStack();
+                return; 
             }
 
             this._stack.push(state);
             this._index++;
+            console.log(`History:push; index = ${this._index}`);
             eventBus.publish('history-changed', this._index, this);
         }
         else {
