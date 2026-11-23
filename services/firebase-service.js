@@ -11,6 +11,19 @@ const ENDPOINT = `${DB_URL}/${DB_PATH}.json`;
 const SCHEMA_VERSION = 1;
 
 export class FirebaseService {
+    constructor() {
+        this._needsSave = false;
+
+        eventBus.subscribe('project-tree-changed', (_projectTree, publisher) => {
+            if (publisher === this) return;
+            this._needsSave = true;
+        });
+    }
+
+    get needsSave() {
+        return this._needsSave;
+    }
+
     async write(projectTree) {
         if (projectTree == null) return this.clear();
         try {
@@ -23,12 +36,12 @@ export class FirebaseService {
                 body: JSON.stringify(envelope)
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            eventBus.publish('saved_to_db', true, this);
+            this._needsSave = false;
+            eventBus.publish('project-tree-saved', projectTree, this);
             eventBus.publish('message', 'Data written to Firebase', this);
             return true;
         } catch (error) {
             console.warn('FirebaseService: write failed', error);
-            eventBus.publish('saved_to_db', false, this);
             eventBus.publish('message', 'Failed to write data to Firebase!', this);
             return false;
         }
@@ -44,6 +57,7 @@ export class FirebaseService {
             const projectTree = ProjectTree.fromObject(parsed.data);
             eventBus.publish('message', 'Data read from Firebase', this);
             localStorageService.write(projectTree);
+            this._needsSave = false;
             return projectTree;
         } catch (error) {
             console.warn('FirebaseService: read failed', error);

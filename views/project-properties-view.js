@@ -12,22 +12,12 @@ export class ProjectPropertiesView {
         this._project = null;
         this._container = document.querySelector(`#${containerId}`);
 
-        // eventBus.subscribe('project-selected', (project, _publisher) => {
-        //     //console.log(`ProjectPropertiesView: Project selected:`, project);
-        //     this._project = project;
-        //     this.render();
-        // });
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             //console.log(`ProjectPropertiesView: Project tree changed:`, projectTree);
             this._projectTree = projectTree;
             this._project = projectTree.selectedProject;
             this.render();
         });
-        // eventBus.subscribe('project-edited', (project, _publisher) => {
-        //     if (this._project && this._project === project) {
-        //         this.render();
-        //     }
-        // });
     }
 
     // Breadcrumbs for the project hierarchy
@@ -40,7 +30,6 @@ export class ProjectPropertiesView {
             projectButton.textContent = ancestor.name;
             projectButton.addEventListener('click', () => {
                 this._projectTree.selectedProject = ancestor;
-                //eventBus.publish('project-selected', ancestor, this);
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             });
             breadcrumbs.prepend(projectButton);
@@ -103,7 +92,6 @@ export class ProjectPropertiesView {
             }
             dropdown.addEventListener('change', () => {
                 this._project.state = dropdown.value;
-                // eventBus.publish('project-edited', this._project, this);
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             });
         }

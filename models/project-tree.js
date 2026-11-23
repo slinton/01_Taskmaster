@@ -19,6 +19,11 @@ export class ProjectTree {
         return this._selectedProject;
     }
 
+    static createDefaultTree() {
+        const rootProject = new Project('Home');
+        return new ProjectTree(rootProject);
+    }
+
     // Convert the ProjectTree instance to a plain object suitable for JSON serialization
     toJSON() {
         return {

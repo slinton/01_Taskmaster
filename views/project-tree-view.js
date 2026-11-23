@@ -12,18 +12,11 @@ import { eventBus } from '../services/event-bus.js';
 import { Project } from '../models/project.js';
 
 export class ProjectTreeView {
-    constructor(containerId = "project-tree-view", projectTree) {
-        this._projectTree = projectTree;
+    constructor(containerId = "project-tree-view") {
+        this._projectTree = null;
         this._container = document.getElementById(containerId);
         this._expandedProjects = new Set();
 
-        // eventBus.subscribe('project-selected', (project, _publisher) => {
-        //     this._projectTree.selectedProject = project;
-        //     this.render();
-        // });
-        // eventBus.subscribe('project-edited', (_project, _publisher) => {
-        //     this.render();
-        // });
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             this._projectTree = projectTree;
             this._expandedProjects.clear();
@@ -84,7 +77,6 @@ export class ProjectTreeView {
         projectName.className = 'project-name';
         projectName.addEventListener('click', () => {
             this._projectTree.selectedProject = project;
-            // eventBus.publish('project-selected', project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         if (this._projectTree.selectedProject === project) {

@@ -1,5 +1,4 @@
 import { ProjectTree } from "./models/project-tree.js";
-
 import { Project } from "./models/project.js";
 import { Task } from "./models/task.js";
 import { Toolbar } from "./views/toolbar.js";
@@ -14,26 +13,17 @@ import { localStorageService } from "./services/local-storage-service.js";
 
 class App {
     constructor() {
-        
-        this._toolbar = new Toolbar('toolbar', this.projectTree);
-        this._projectTreeView = new ProjectTreeView('project-tree-view', this.projectTree);
+        // Create views
+        this._toolbar = new Toolbar('toolbar');
+        this._projectTreeView = new ProjectTreeView('project-tree-view');
         this._projectPropertiesView = new ProjectPropertiesView('project-properties-view');
         this._subprojectsView = new SubprojectsView('subprojects-view');
         this._tasksView = new TasksView('tasks-view');
         this._messageView = new MessageView('message-view');
 
         // Read tree from local storage if it exists
-        const savedTree = localStorageService.read();
-        if (savedTree) {
-            this.projectTree = savedTree;
-            eventBus.publish('message', 'Project tree loaded from local storage', this);
-        } else {
-            const rootProject = this.createProject();
-            this.projectTree = new ProjectTree(rootProject);
-            eventBus.publish('message', 'Project tree initialized with default project', this);
-        }
-
-        eventBus.publish('project-tree-changed', this.projectTree, this);
+        const projectTree = localStorageService.read() ?? ProjectTree.createDefaultTree();
+        eventBus.publish('project-tree-changed', projectTree, this);
     }
 
     createProject(i = 0, depth = 3) {
@@ -54,8 +44,6 @@ class App {
     }
 
     start() {
-        console.log("App started");
-        //eventBus.publish('message', 'App started', this);
     }
 }
 

@@ -20,18 +20,6 @@ export class SubprojectsView {
         this._selectedSubproject = null;
         this._selectedDiv = null;
 
-        // Event bus for handling project-related events
-        // eventBus.subscribe('project-selected', (project, _publisher) => {
-        //     //console.log(`SubprojectsView: Project selected:`, project);
-        //     this._project = project;
-        //     this.render();
-        // });
-        // eventBus.subscribe('project-edited', (project, _publisher) => {
-        //     //console.log(`SubprojectsView: Project edited:`, project);
-        //     if (this._project && project === this._project) {
-        //         this.render();
-        //     }
-        // });
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
             //console.log(`SubprojectsView: Project tree changed:`, projectTree);
             this._projectTree = projectTree;
@@ -59,7 +47,6 @@ export class SubprojectsView {
             console.log('Alt key pressed with ArrowUp');
             const subprojects = this._project.subprojects;
             [subprojects[currentIndex], subprojects[newIndex]] = [subprojects[newIndex], subprojects[currentIndex]];
-            // eventBus.publish('project-edited', this._project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         }
         // Move selection
@@ -81,8 +68,8 @@ export class SubprojectsView {
                 newSubproject.parent = this._project;
                 this._project.subprojects.push(newSubproject);
                 newSubprojectInput.value = '';
-                // eventBus.publish('project-edited', this._project, this);
                 eventBus.publish('project-tree-changed', this._projectTree, this);
+                
             }
         });
         return newSubprojectInput;
@@ -195,6 +182,7 @@ export class SubprojectsView {
         // New subproject input
         const newSubprojectInput = this.createSubprojectInput();
         this._container.appendChild(newSubprojectInput);
+        newSubprojectInput.focus();
 
         // List of subprojects
         const itemsList = this.createSubprojectList();

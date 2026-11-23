@@ -4,14 +4,18 @@ import { history } from '../services/history.js';
 import { eventBus } from '../services/event-bus.js';
 
 export class Toolbar {
-    constructor(containerId = "toolbar", projectTree) {
+    constructor(containerId = "toolbar") {
         this._container = document.getElementById(containerId);
-        this._projectTree = projectTree;
+        this._projectTree = null;
 
+        eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
+            this._projectTree = projectTree;
+            this.render();
+        });
         eventBus.subscribe('history-changed', (_index, _publisher) => {
             this.render();
         });
-        eventBus.subscribe('saved_to_db', (_success, _publisher) => {
+        eventBus.subscribe('project-tree-saved', (_projectTree, _publisher) => {
             this.render();
         });
     }
@@ -20,6 +24,7 @@ export class Toolbar {
         console.log(`Toolbar: Rendering`);
         this._container.replaceChildren();
 
+        // Undo button
         const undo_button = this.createButton({ icon: 'undo', label: 'Undo', title: 'Undo' });
         undo_button.disabled = !history.canUndo();
         undo_button.addEventListener('click', () => {
@@ -27,6 +32,7 @@ export class Toolbar {
         });
         this._container.appendChild(undo_button);
 
+        // Redo button
         const redo_button = this.createButton({ icon: 'redo', label: 'Redo', title: 'Redo' });
         redo_button.disabled = !history.canRedo();
         redo_button.addEventListener('click', () => {
@@ -34,13 +40,14 @@ export class Toolbar {
         });
         this._container.appendChild(redo_button);
 
+        // Save to local storage
         const save_local_button = this.createButton({ icon: 'save', label: 'Save locally', title: 'Save locally' });
-        save_local_button.disabled = !history.isUnsaved;
         save_local_button.addEventListener('click', () => {
-            localStorageService.write(this._projectTree);
+            localStorageService.write();
         });
         this._container.appendChild(save_local_button);
 
+        // Load from local storage
         const load_local_button = this.createButton({ icon: 'folder_open', label: 'Load locally', title: 'Load locally' });
         load_local_button.addEventListener('click', () => {
             this._projectTree = localStorageService.read();
@@ -48,47 +55,28 @@ export class Toolbar {
         });
         this._container.appendChild(load_local_button);
 
+        // Save to firebase
         const save_button = this.createButton({ icon: 'cloud_upload', label: 'Save to cloud', title: 'Save to cloud' });
-        save_button.disabled = !history.isUnsaved;
-        save_button.addEventListener('click', () => {
-            this.saveProjectTreeToFirebase();
+        save_button.disabled = !this._projectTree || !firebaseService.needsSave;
+        console.log(`Toolbar: Save button disabled = ${save_button.disabled}`);
+        save_button.addEventListener('click', async () => {
+            if (!this._projectTree) return;
+            const saved = await firebaseService.write(this._projectTree);
+            console.log(saved ? 'Saved project tree to Firebase.' : 'Firebase save failed.');
         });
+        console.log(`Toolbar: Save button needsSave = ${firebaseService.needsSave}`);
+        save_button.disabled = !firebaseService.needsSave;
         this._container.appendChild(save_button);
 
+        // Load from firebase
         const load_button = this.createButton({ icon: 'cloud_download', label: 'Load from cloud', title: 'Load from cloud' });
-        load_button.addEventListener('click', () => {
-            this.loadProjectTreeFromFirebase();
+        load_button.addEventListener('click', async () => {
+            const projectTree = await firebaseService.read();
+            if (!projectTree) return;
+            this._projectTree = projectTree;
+            eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         this._container.appendChild(load_button);
-
-    }
-
-    #applyLoadedTree(projectTree) {
-        console.log('Loaded project tree:', projectTree);
-        // A failed or empty load returns null; keep the current tree in that case.
-        if (!projectTree) return;
-        this._projectTree = projectTree;
-        eventBus.publish('project-tree-changed', projectTree, this);
-    }
-
-    async saveProjectTreeToFirebase() {
-        if (!this._projectTree) return;
-        const saved = await firebaseService.write(this._projectTree);
-        console.log(saved ? 'Saved project tree to Firebase.' : 'Firebase save failed.');
-    }
-
-    async loadProjectTreeFromFirebase() {
-        this.#applyLoadedTree(await firebaseService.read());
-    }
-
-    saveProjectTree() {
-        if (this._projectTree) {
-            localStorageService.write(this._projectTree);
-        }
-    }
-
-    loadProjectTree() {
-        this.#applyLoadedTree(localStorageService.read());
     }
 
     createButton({ icon, label, title }) {

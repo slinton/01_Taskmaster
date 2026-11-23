@@ -69,6 +69,7 @@ export class TasksView {
                 this._project.tasks.push(newTask);
                 newTaskInput.value = '';
                 eventBus.publish('project-tree-changed', this._projectTree, this);
+                newTaskInput.focus();
             }
         });
         return newTaskInput;
@@ -201,6 +202,7 @@ export class TasksView {
         // New task input
         const newTaskInput = this.createTaskInput();
         this._container.appendChild(newTaskInput);
+        newTaskInput.focus();
 
         // List of tasks
         const itemsList = this.createTaskList();

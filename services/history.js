@@ -4,7 +4,6 @@
 //
 import { eventBus } from '../services/event-bus.js';
 import { ProjectTree } from '../models/project-tree.js';
-import { localStorageService } from './local-storage-service.js';
 
 export class History {
 
@@ -12,32 +11,14 @@ export class History {
         this._projectTree = null
         this._stack = [];
         this._index = -1; // index of current state
-        this._isUnsaved = false;
        
         eventBus.subscribe('project-tree-changed', (projectTree, publisher) => {
             if (this === publisher) return;
             this._projectTree = projectTree;
             this.push();
         });
-        eventBus.subscribe('project-edited', (_project, publisher) => {
-            if (this === publisher) return;
-            this.push();
-        });
-        // TODO: reconsider how this works
-        eventBus.subscribe('saved_to_db', (_success, publisher) => {
-            if (this === publisher) return;
-            this._isUnsaved = false;
-        });
     }
-
-    get isUnsaved() {
-        return this._isUnsaved;
-    }
-
-    set isUnsaved(value) {
-        this._isUnsaved = value;
-    }
-
+      
     push() {
         if (this._projectTree) {
             // Remove any redo states beyond the current index
@@ -56,9 +37,6 @@ export class History {
             this._stack.push(state);
             this._index++;
             eventBus.publish('history-changed', this._index, this);
-            // TODO: make localStorage service stand-alone
-            localStorageService.write(this._projectTree);
-            this._isUnsaved = true;
         }
         else {
             console.log(`****History: No project tree available to push.`);
