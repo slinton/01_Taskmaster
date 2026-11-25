@@ -22,6 +22,7 @@ export class TasksView {
         this._selectedDiv = null;
 
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
+            if (!projectTree) return;
             this._projectTree = projectTree;
             this._project = projectTree.selectedProject;
             this.render();

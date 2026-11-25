@@ -13,7 +13,7 @@ export class ProjectPropertiesView {
         this._container = document.querySelector(`#${containerId}`);
 
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
-            //console.log(`ProjectPropertiesView: Project tree changed:`, projectTree);
+            if (!projectTree) return;
             this._projectTree = projectTree;
             this._project = projectTree.selectedProject;
             this.render();

@@ -17,7 +17,6 @@ class App {
 
     async start() {
         await persistenceService.readOnStartup();
-
         eventBus.publish('show-page', 'home-page', this);
     }
 }

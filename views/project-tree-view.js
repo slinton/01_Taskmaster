@@ -18,6 +18,7 @@ export class ProjectTreeView {
         this._expandedProjects = new Set();
 
         eventBus.subscribe('project-tree-changed', (projectTree, _publisher) => {
+            if (!projectTree) return;
             this._projectTree = projectTree;
             this._expandedProjects.clear();
             this._expandedProjects.add(projectTree.rootProject);

@@ -39,7 +39,8 @@ export class PersistenceService {
         }
 
         // Local storage read failed, create an empty project tree
-        this._projectTree = ProjectTree.createEmpty();
+        // this._projectTree = ProjectTree.createEmpty();
+        this._projectTree = null;
         console.log('PersistenceService: Created empty project tree');
         eventBus.publish('project-tree-changed', this._projectTree, this);
     }
