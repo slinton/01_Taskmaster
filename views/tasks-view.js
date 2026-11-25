@@ -44,10 +44,8 @@ export class TasksView {
         event.preventDefault();
         // Swap order of tasks if Alt key is pressed
         if (event.altKey) {
-            //console.log('Alt key pressed with ArrowUp');
             const tasks = this._project.tasks;
             [tasks[currentIndex], tasks[newIndex]] = [tasks[newIndex], tasks[currentIndex]];
-            // eventBus.publish('project-edited', this._project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         }
         // Move selection
@@ -82,8 +80,8 @@ export class TasksView {
         taskCheckbox.checked = task.completed;
         taskCheckbox.addEventListener('change', () => {
             task.completed = taskCheckbox.checked;
+            this._project.checkCompletedStatus();
             console.log(`Task "${task.name}" completion changed to ${task.completed}`);
-            // eventBus.publish('project-edited', this._project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         return taskCheckbox;
@@ -94,9 +92,6 @@ export class TasksView {
         const taskNameInput = document.createElement('input');
         taskNameInput.type = 'text';
         taskNameInput.value = task.name;
-        // taskNameInput.addEventListener('click', () => {
-        //     taskNameInput.select();
-        // });
         taskNameInput.addEventListener('blur', () => {
             task.name = taskNameInput.value;
             // eventBus.publish('project-edited', this._project, this);
@@ -122,7 +117,6 @@ export class TasksView {
             const index = this._project.tasks.indexOf(task);
             if (index > -1) {
                 this._project.tasks.splice(index, 1);
-                // eventBus.publish('project-edited', this._project, this);
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });

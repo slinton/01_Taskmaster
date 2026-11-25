@@ -107,27 +107,18 @@ export class Project {
         return this._tasks.length > 0;
     }
 
-    // Get count of all tasks in this project and its descendant subprojects
-    getTaskCount() {
-        let count = this._tasks.length;
+    // Get count of tasks in this project and its descendants
+    getTaskCount(filter = () => true) {
+        let count = this._tasks.filter(filter).length;
         for (const subproject of this._subprojects) {
-            count += subproject.getTaskCount();
-        }
-        return count;
-    }
-
-    // Get count of all complete tasks in this project and its descendant subprojects
-    getCompletedTaskCount() {
-        let count = this._tasks.filter(task => task.completed).length;
-        for (const subproject of this._subprojects) {
-            count += subproject.getCompletedTaskCount();
+            count += subproject.getTaskCount(filter);
         }
         return count;
     }
 
     getCompletionDescription() {
         const total = this.getTaskCount();
-        const complete = this.getCompletedTaskCount();
+        const complete = this.getTaskCount(task => task.completed);
         return `${complete} of ${total} tasks complete`;
     }
 
@@ -141,14 +132,19 @@ export class Project {
         return subprojects;
     }
 
+    checkCompletedStatus() {
+        const completed = this.getTaskCount() > 0 && this.getTaskCount(task => !task.completed) === 0;
+        this.state = completed ? ProjectState.COMPLETED : ProjectState.ACTIVE;
+    }
+
     static createDummyProject(i = 0, depth = 3) {
         const project = i == 0 ? new Project('Home') : new Project(`Project ${i}`);
         try {
             project.addTask(new Task(`Task ${i}1`));
             project.addTask(new Task(`Task ${i}2`));
             if (depth > 1) {
-                project.addSubproject(this.createProject(2*i + 1, depth - 1));
-                project.addSubproject(this.createProject(2*i + 2, depth - 1));
+                project.addSubproject(this.createDummyProject(2*i + 1, depth - 1));
+                project.addSubproject(this.createDummyProject(2*i + 2, depth - 1));
             }
         } catch (error) {
             console.error(error);

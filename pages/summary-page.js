@@ -54,7 +54,7 @@ export class SummaryPage {
         const activeProjects = rootProject.getAllSubprojects(p => p.state === ProjectState.ACTIVE);
         console.log(`ActiveProjectsView: Found ${activeProjects.length} active projects`);
         activeProjects.forEach(project => {
-            const numTasksRemaining = project.getTaskCount() - project.getCompletedTaskCount();
+            const numTasksRemaining = project.getTaskCount(task => !task.completed);
             const projectItem = document.createElement('div');
             projectItem.textContent = `${project.name} (${numTasksRemaining} tasks remaining)` ;
             projectList.appendChild(projectItem);
