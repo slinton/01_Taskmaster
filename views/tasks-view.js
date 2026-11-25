@@ -62,14 +62,24 @@ export class TasksView {
         const newTaskInput = document.createElement('input');
         newTaskInput.type = 'text';
         newTaskInput.placeholder = 'Add a new task';
-        newTaskInput.addEventListener('keypress', (event) => {
+        newTaskInput.addEventListener('keydown', (event) => {
+            console.log(event)
             if (event.key === 'Enter' && newTaskInput.value.trim() !== '') {
                 const newTask = new Task(newTaskInput.value.trim());
-                this._project.tasks.push(newTask);
+                this._project.addTask(newTask);
+                this._project.sortTasksByUncompleted();
+                this._project.checkCompletedStatus();
                 newTaskInput.value = '';
                 eventBus.publish('project-tree-changed', this._projectTree, this);
                 newTaskInput.focus();
             }
+            else if (event.key === 'Escape') {
+                console.log('Escape pressed, clearing input');
+                newTaskInput.value = '';
+            }
+        });
+        newTaskInput.addEventListener('blur', () => {
+            newTaskInput.value = '';
         });
         return newTaskInput;
     }
@@ -81,6 +91,7 @@ export class TasksView {
         taskCheckbox.checked = task.completed;
         taskCheckbox.addEventListener('change', () => {
             task.completed = taskCheckbox.checked;
+            this._project.sortTasksByUncompleted();
             this._project.checkCompletedStatus();
             console.log(`Task "${task.name}" completion changed to ${task.completed}`);
             eventBus.publish('project-tree-changed', this._projectTree, this);
@@ -95,7 +106,6 @@ export class TasksView {
         taskNameInput.value = task.name;
         taskNameInput.addEventListener('blur', () => {
             task.name = taskNameInput.value;
-            // eventBus.publish('project-edited', this._project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         taskNameInput.addEventListener('keydown', (event) => {
@@ -118,6 +128,7 @@ export class TasksView {
             const index = this._project.tasks.indexOf(task);
             if (index > -1) {
                 this._project.tasks.splice(index, 1);
+                this._project.checkCompletedStatus();
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });

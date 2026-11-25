@@ -153,4 +153,16 @@ export class Project {
         }
         return project;
     }
+
+    sortTasksByUncompleted() {
+        const uncompletedTasks = this._tasks.filter(task => !task.completed);
+        const completedTasks = this._tasks.filter(task => task.completed);
+        this._tasks = [...uncompletedTasks, ...completedTasks];
+    }
+
+    sortSubprojectsByUncompleted() {
+        const uncompletedSubprojects = this._subprojects.filter(subproject => subproject.state !== ProjectState.COMPLETED);
+        const completedSubprojects = this._subprojects.filter(subproject => subproject.state === ProjectState.COMPLETED);
+        this._subprojects = [...uncompletedSubprojects, ...completedSubprojects];
+    }
 }   

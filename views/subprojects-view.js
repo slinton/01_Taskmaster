@@ -63,15 +63,21 @@ export class SubprojectsView {
         const newSubprojectInput = document.createElement('input');
         newSubprojectInput.type = 'text';
         newSubprojectInput.placeholder = 'Add a new subproject';
-        newSubprojectInput.addEventListener('keypress', (event) => {
+        newSubprojectInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && newSubprojectInput.value.trim() !== '') {
                 const newSubproject = new Project(newSubprojectInput.value.trim());
                 newSubproject.parent = this._project;
                 this._project.subprojects.push(newSubproject);
                 newSubprojectInput.value = '';
                 eventBus.publish('project-tree-changed', this._projectTree, this);
-                
+
             }
+            else if (event.key === 'Escape') {
+                newSubprojectInput.value = '';
+            }
+        });
+        newSubprojectInput.addEventListener('blur', () => {
+            newSubprojectInput.value = '';
         });
         return newSubprojectInput;
     }
@@ -141,7 +147,7 @@ export class SubprojectsView {
 
         const subprojectNameInput = this.createSubprojectNameInput(subproject);
         subprojectDiv.appendChild(subprojectNameInput);
-        
+
         // Delete button
         const deleteButtonElement = this.createDeleteButton(subproject);
         subprojectDiv.appendChild(deleteButtonElement);
