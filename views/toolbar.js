@@ -16,6 +16,20 @@ export class Toolbar {
         console.log(`Toolbar: Rendering`);
         this._container.replaceChildren();
 
+        // Home button
+        const home_button = this.createButton({ icon: 'home', label: 'Home', title: 'Home'});
+        home_button.addEventListener('click', () => {
+            eventBus.publish('show-page', 'home-page', this);
+        });
+        this._container.appendChild(home_button);
+
+        // Summary button
+        const summary_button = this.createButton({ icon: 'S', label: 'S', title: 'S'});
+        summary_button.addEventListener('click', () => {
+            eventBus.publish('show-page', 'summary-page', this);
+        });
+        this._container.appendChild(summary_button);
+
         // Undo button
         const undo_button = this.createButton({ icon: 'undo', label: 'Undo', title: 'Undo' });
         undo_button.disabled = !history.canUndo();

@@ -1,0 +1,17 @@
+#home-page {
+    .content {
+        font: inherit;
+        display: flex;
+        height: 100%;
+        padding: 0rem;
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+}

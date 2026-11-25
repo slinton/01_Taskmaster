@@ -15,6 +15,19 @@ export class SummaryPage {
             this._projectTree = projectTree;
             this.render();
         });
+
+        eventBus.subscribe('show-page', (pageId, _publisher) => {
+            console.log(`Received show-page, id = ${pageId}`);
+            console.log()
+            if (this._container.id === pageId) {
+                console.log('SummaryPage showing');
+                this._container.classList.remove('hidden');
+            }
+            else {
+                console.log('SummaryPage hiding');
+                this._container.classList.add('hidden')
+            }
+        });
     }
 
     // Render the project properties view
