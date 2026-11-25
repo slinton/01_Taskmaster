@@ -132,6 +132,19 @@ export class Project {
         return subprojects;
     }
 
+    getAllTasks(filter = () => true) {
+        const tasks = [];
+        for (const task of this._tasks) {
+            if (filter(task)) {
+                tasks.push(task);
+            }
+        }
+        for (const subproject of this._subprojects) {
+            tasks.push(...subproject.getAllTasks(filter));
+        }
+        return tasks;
+    }
+
     checkCompletedStatus() {
         const completed = this.getTaskCount() > 0 && this.getTaskCount(task => !task.completed) === 0;
         this.state = completed ? ProjectState.COMPLETED : ProjectState.ACTIVE;

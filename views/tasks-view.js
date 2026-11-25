@@ -63,7 +63,6 @@ export class TasksView {
         newTaskInput.type = 'text';
         newTaskInput.placeholder = 'Add a new task';
         newTaskInput.addEventListener('keydown', (event) => {
-            console.log(event)
             if (event.key === 'Enter' && newTaskInput.value.trim() !== '') {
                 const newTask = new Task(newTaskInput.value.trim());
                 this._project.addTask(newTask);

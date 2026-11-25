@@ -3,6 +3,7 @@
     background: canvas;
     padding: 1rem;
     border-right: solid 1px gray;
+    border-left: solid 1rem gray;
 
     input[type="text"] {
         background: rgb(230, 230, 230);

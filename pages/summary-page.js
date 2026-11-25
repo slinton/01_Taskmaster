@@ -55,16 +55,33 @@ export class SummaryPage {
         console.log(`ActiveProjectsView: Found ${activeProjects.length} active projects`);
         activeProjects.sort((a, b) => a.getTaskCount(task => !task.completed) - b.getTaskCount(task => !task.completed));
         activeProjects.forEach(project => {
-            const numTasksRemaining = project.getTaskCount(task => !task.completed);
+            // Display the active project and the number of remaining tasks
             const projectItem = document.createElement('div');
             projectItem.className = 'project-item';
-            projectItem.textContent = `${project.name} (${numTasksRemaining} tasks remaining)`;
+            projectItem.textContent = `${project.name}`;
             projectItem.addEventListener('click', () => {
                 console.log(`Project clicked: ${project.name}`);
                 this._projectTree.selectedProject = project;
                 eventBus.publish('project-tree-changed', this._projectTree, this);
                 eventBus.publish('show-page', 'home-page', this);
             });
+
+            // Show up to 3 uncompleted tasks for this project
+            const numUncompletedTasks = project.getTaskCount(task => !task.completed);
+            for (let i = 0; i < Math.min(3, numUncompletedTasks); i++) {
+                const task = project.getAllTasks(task => !task.completed)[i];
+                
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.textContent = task.name;
+                projectItem.appendChild(taskItem);
+            }
+            if (numUncompletedTasks > 3) {
+                const moreTasksItem = document.createElement('div');
+                moreTasksItem.className = 'task-item additional-task-item';
+                moreTasksItem.textContent = `...and ${numUncompletedTasks - 3} more tasks`;
+                projectItem.appendChild(moreTasksItem);
+            }
             projectList.appendChild(projectItem);
         });
     }

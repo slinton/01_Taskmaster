@@ -1,26 +1,40 @@
 
 #summary-page {
-    padding: 1rem;
+    padding: 2rem;
 
     h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
         margin-bottom: 0.5rem;
     }
 
     #project-list {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .project-item {
+        font-size: 1.25rem;
+        font-weight: bold;
         border: 1px solid #ccc;
         padding: 0.5rem;
         border-radius: 4px;
         cursor: pointer;
         transition: background 0.3s;
     }
+    
     .project-item:hover {
         background: #f0f0f0;
+    }
+
+    .task-item {
+        font-size: 1rem;
+        font-weight: normal;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .additional-task-item {
+        font-style: italic;
     }
 }
