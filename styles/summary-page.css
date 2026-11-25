@@ -1,0 +1,17 @@
+
+#summary-page {
+    padding: 1rem;
+    background: salmon;
+    display: none;
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #project-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

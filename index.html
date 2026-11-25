@@ -19,37 +19,49 @@
     <link rel="stylesheet" href="styles/tasks-view.css">
     <link rel="stylesheet" href="styles/project-tree-view.css">
     <link rel="stylesheet" href="styles/message-view.css">
-
+    <link rel="stylesheet" href="styles/summary-page.css">
     <script type="module" src="app.js" defer></script>
 </head>
 
 <body>
     <div class="app-body">
 
-        <!-- Toolbar -->
-        <div id="toolbar" class="toolbar"></div>
+        <!-- Home Pagge -->
+        <div id="home-page">
 
-        <!-- Main Content -->
-        <div class="content">
+            <!-- Toolbar -->
+            <div id="toolbar" class="toolbar"></div>
 
-            <!-- ProjectTree View -->
-            <div id="project-tree-view"></div>
+            <!-- Main Content -->
+            <div class="content">
 
-            <!-- Project Detail View -->
-            <div id="project-detail-view">
-                <div id="project-properties-view"></div>
+                <!-- ProjectTree View -->
+                <div id="project-tree-view"></div>
 
-                <!-- Subprojects View -->
-                <div id="subprojects-view"></div>
+                <!-- Project Detail View -->
+                <div id="project-detail-view">
+                    <div id="project-properties-view"></div>
 
-                <!-- Tasks View -->
-                <div id="tasks-view"></div>
+                    <!-- Subprojects View -->
+                    <div id="subprojects-view"></div>
+
+                    <!-- Tasks View -->
+                    <div id="tasks-view"></div>
+                </div>
+
             </div>
+
+            <!-- Error View -->
+            <div id="message-view"></div>
 
         </div>
 
-        <!-- Error View -->
-        <div id="message-view"></div>
+
+        <!-- Summary Page -->
+        <div id="summary-page">
+
+        </div>
+
 
     </div>
 </body>

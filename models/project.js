@@ -117,17 +117,44 @@ export class Project {
     }
 
     // Get count of all complete tasks in this project and its descendant subprojects
-    getCompleteTaskCount() {
+    getCompletedTaskCount() {
         let count = this._tasks.filter(task => task.completed).length;
         for (const subproject of this._subprojects) {
-            count += subproject.getCompleteTaskCount();
+            count += subproject.getCompletedTaskCount();
         }
         return count;
     }
 
     getCompletionDescription() {
         const total = this.getTaskCount();
-        const complete = this.getCompleteTaskCount();
+        const complete = this.getCompletedTaskCount();
         return `${complete} of ${total} tasks complete`;
+    }
+
+    getAllSubprojects(filter = () => true) {
+        const subprojects = [];
+        for (const subproject of this._subprojects) {
+            if (!filter(subproject)) continue;
+            subprojects.push(subproject);
+            subprojects.push(...subproject.getAllSubprojects(filter));
+        }
+        return subprojects;
+    }
+
+    static createDummyProject(i = 0, depth = 3) {
+        const project = i == 0 ? new Project('Home') : new Project(`Project ${i}`);
+        try {
+            project.addTask(new Task(`Task ${i}1`));
+            project.addTask(new Task(`Task ${i}2`));
+            if (depth > 1) {
+                project.addSubproject(this.createProject(2*i + 1, depth - 1));
+                project.addSubproject(this.createProject(2*i + 2, depth - 1));
+            }
+        } catch (error) {
+            console.error(error);
+            this._messageView.showMessage(error);
+            return;
+        }
+        return project;
     }
 }   

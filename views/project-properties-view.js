@@ -65,7 +65,7 @@ export class ProjectPropertiesView {
         const meter = document.createElement('meter');
         if (this._project) {
             meter.max = this._project.getTaskCount();
-            meter.value = this._project.getCompleteTaskCount();
+            meter.value = this._project.getCompletedTaskCount();
         }
         return meter;
     }
