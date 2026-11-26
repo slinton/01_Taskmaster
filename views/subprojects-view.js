@@ -68,6 +68,7 @@ export class SubprojectsView {
                 const newSubproject = new Project(newSubprojectInput.value.trim());
                 newSubproject.parent = this._project;
                 this._project.subprojects.push(newSubproject);
+                this._project.changeStateToActiveIfAnyTaskNotCompleted();
                 newSubprojectInput.value = '';
                 eventBus.publish('project-tree-changed', this._projectTree, this);
 
@@ -88,7 +89,6 @@ export class SubprojectsView {
         subprojectNameInput.value = subproject.name;
         subprojectNameInput.addEventListener('blur', () => {
             subproject.name = subprojectNameInput.value;
-            // eventBus.publish('project-edited', this._project, this);
             eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         subprojectNameInput.addEventListener('keydown', (event) => {
@@ -110,7 +110,7 @@ export class SubprojectsView {
             const index = this._project.subprojects.indexOf(subproject);
             if (index > -1) {
                 this._project.subprojects.splice(index, 1);
-                // eventBus.publish('project-edited', this._project, this);
+                this._project.changeStateToCompletedIfAllTasksCompleted();
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });

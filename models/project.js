@@ -107,18 +107,22 @@ export class Project {
         return this._tasks.length > 0;
     }
 
-    // Get count of tasks in this project and its descendants
     getTaskCount(filter = () => true) {
-        let count = this._tasks.filter(filter).length;
-        for (const subproject of this._subprojects) {
-            count += subproject.getTaskCount(filter);
-        }
-        return count;
+        return this._tasks.filter(filter).length;
     }
 
+    // Get count of tasks in this project and its descendants
+    getAllTaskCount(filter = () => true) {
+        let count = this._tasks.filter(filter).length;
+        for (const subproject of this._subprojects) {
+            count += subproject.getAllTaskCount(filter);
+        }
+        return count;
+    } 
+
     getCompletionDescription() {
-        const total = this.getTaskCount();
-        const complete = this.getTaskCount(task => task.completed);
+        const total = this.getAllTaskCount();
+        const complete = this.getAllTaskCount(task => task.completed);
         return `${complete} of ${total} tasks complete`;
     }
 
@@ -145,9 +149,49 @@ export class Project {
         return tasks;
     }
 
-    checkCompletedStatus() {
-        const completed = this.getTaskCount() > 0 && this.getTaskCount(task => !task.completed) === 0;
-        this.state = completed ? ProjectState.COMPLETED : ProjectState.ACTIVE;
+    // A project with no tasks is not complete
+    shouldBeInCompletedState() {
+        // No tasks: not considered completed
+        if (this._tasks.length === 0) return false;
+    
+        // If there are any incomplete tasks, the project is not complete
+        if (this.getTaskCount(task => !task.completed) > 0) return false;
+
+        // Check subprojects: if any subproject is not complete, this project is not complete
+        for (const subproject of this._subprojects) {
+            if (!subproject.shouldBeInCompletedState()) return false;
+        }
+
+        return true;
+    }
+
+    // Call this on an incomplete project when a task is marked completed, 
+    // or when an incomplete task is removed.
+    // This will recursively set the state of parent projects
+    changeStateToCompletedIfAllTasksCompleted() {
+        if (this.state === ProjectState.COMPLETED) return;
+
+        if (!this.shouldBeInCompletedState()) return;
+
+        this.state = ProjectState.COMPLETED;
+        const parent = this._parent;
+        if (parent) {
+            parent.changeStateToCompletedIfAllTasksCompleted();
+        }
+    }
+
+    // Call this on a completed project when a task is added, a subproject is added,
+    // or when an completed task is changed to not completed.
+    changeStateToActiveIfAnyTaskNotCompleted() {
+        if (this.state !== ProjectState.COMPLETED) return;
+
+        if (this.shouldBeInCompletedState()) return;
+
+        this.state = ProjectState.ACTIVE;
+        const parent = this._parent;
+        if (parent) {
+            parent.changeStateToActiveIfAnyTaskNotCompleted();
+        }
     }
 
     static createDummyProject(i = 0, depth = 3) {

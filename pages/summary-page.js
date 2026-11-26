@@ -53,7 +53,7 @@ export class SummaryPage {
         const rootProject = this._projectTree.rootProject;
         const activeProjects = rootProject.getAllSubprojects(p => p.state === ProjectState.ACTIVE);
         console.log(`ActiveProjectsView: Found ${activeProjects.length} active projects`);
-        activeProjects.sort((a, b) => a.getTaskCount(task => !task.completed) - b.getTaskCount(task => !task.completed));
+        activeProjects.sort((a, b) => a.getAllTaskCount(task => !task.completed) - b.getAllTaskCount(task => !task.completed));
         activeProjects.forEach(project => {
             // Display the active project and the number of remaining tasks
             const projectItem = document.createElement('div');
@@ -67,7 +67,7 @@ export class SummaryPage {
             });
 
             // Show up to 3 uncompleted tasks for this project
-            const numUncompletedTasks = project.getTaskCount(task => !task.completed);
+            const numUncompletedTasks = project.getAllTaskCount(task => !task.completed);
             for (let i = 0; i < Math.min(3, numUncompletedTasks); i++) {
                 const task = project.getAllTasks(task => !task.completed)[i];
                 

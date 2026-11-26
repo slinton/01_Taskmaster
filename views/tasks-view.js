@@ -2,6 +2,7 @@
 // TasksView displays all tasks for the selected project
 //
 import { Project } from '../models/project.js';
+import { ProjectState } from '../models/project.js';
 import { Task } from '../models/task.js';
 import { eventBus } from '../services/event-bus.js';
 
@@ -65,9 +66,13 @@ export class TasksView {
         newTaskInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && newTaskInput.value.trim() !== '') {
                 const newTask = new Task(newTaskInput.value.trim());
+                if (this._project.state === ProjectState.COMPLETED) {
+                    this._project.state = ProjectState.ACTIVE;
+                }
+                console.log(`Creating new task: ${newTask.name}`);
                 this._project.addTask(newTask);
                 this._project.sortTasksByUncompleted();
-                this._project.checkCompletedStatus();
+                this._project.changeStateToActiveIfAnyTaskNotCompleted();
                 newTaskInput.value = '';
                 eventBus.publish('project-tree-changed', this._projectTree, this);
                 newTaskInput.focus();
@@ -91,8 +96,12 @@ export class TasksView {
         taskCheckbox.addEventListener('change', () => {
             task.completed = taskCheckbox.checked;
             this._project.sortTasksByUncompleted();
-            this._project.checkCompletedStatus();
-            console.log(`Task "${task.name}" completion changed to ${task.completed}`);
+            if (task.completed) {
+                this._project.changeStateToCompletedIfAllTasksCompleted();
+            }
+            else  {
+                this._project.changeStateToActiveIfAnyTaskNotCompleted();
+            }
             eventBus.publish('project-tree-changed', this._projectTree, this);
         });
         return taskCheckbox;
@@ -127,7 +136,7 @@ export class TasksView {
             const index = this._project.tasks.indexOf(task);
             if (index > -1) {
                 this._project.tasks.splice(index, 1);
-                this._project.checkCompletedStatus();
+                this._project.changeStateToCompletedIfAllTasksCompleted();
                 eventBus.publish('project-tree-changed', this._projectTree, this);
             }
         });
