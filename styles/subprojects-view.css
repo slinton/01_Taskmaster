@@ -40,4 +40,9 @@
         }
     }
 
+    .subproject-state {
+        width: 100%;
+        font-style: italic;
+    }
+
 }

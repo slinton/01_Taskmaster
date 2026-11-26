@@ -18,6 +18,7 @@ export class Project {
         this._subprojects = [];
         this._tasks = [];
         this._state = ProjectState.NOT_STARTED;
+        this._starred = false;
     }
 
     get name() {
@@ -54,6 +55,14 @@ export class Project {
 
     set state(state) {
         this._state = state;
+    }
+
+    get starred() {
+        return this._starred;
+    }
+
+    set starred(starred) {
+        this._starred = starred;
     }
 
     // Convert the Project instance to a plain object suitable for JSON serialization
@@ -194,6 +203,18 @@ export class Project {
         }
     }
 
+    sortTasksByUncompleted() {
+        const uncompletedTasks = this._tasks.filter(task => !task.completed);
+        const completedTasks = this._tasks.filter(task => task.completed);
+        this._tasks = [...uncompletedTasks, ...completedTasks];
+    }
+
+    sortSubprojectsByUncompleted() {
+        const uncompletedSubprojects = this._subprojects.filter(subproject => subproject.state !== ProjectState.COMPLETED);
+        const completedSubprojects = this._subprojects.filter(subproject => subproject.state === ProjectState.COMPLETED);
+        this._subprojects = [...uncompletedSubprojects, ...completedSubprojects];
+    }
+
     static createDummyProject(i = 0, depth = 3) {
         const project = i == 0 ? new Project('Home') : new Project(`Project ${i}`);
         try {
@@ -209,17 +230,5 @@ export class Project {
             return;
         }
         return project;
-    }
-
-    sortTasksByUncompleted() {
-        const uncompletedTasks = this._tasks.filter(task => !task.completed);
-        const completedTasks = this._tasks.filter(task => task.completed);
-        this._tasks = [...uncompletedTasks, ...completedTasks];
-    }
-
-    sortSubprojectsByUncompleted() {
-        const uncompletedSubprojects = this._subprojects.filter(subproject => subproject.state !== ProjectState.COMPLETED);
-        const completedSubprojects = this._subprojects.filter(subproject => subproject.state === ProjectState.COMPLETED);
-        this._subprojects = [...uncompletedSubprojects, ...completedSubprojects];
     }
 }   

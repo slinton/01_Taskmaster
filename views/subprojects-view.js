@@ -148,6 +148,11 @@ export class SubprojectsView {
         const subprojectNameInput = this.createSubprojectNameInput(subproject);
         subprojectDiv.appendChild(subprojectNameInput);
 
+        const subprojectStateLabel = document.createElement('span');
+        subprojectStateLabel.className = 'subproject-state';
+        subprojectStateLabel.textContent = subproject.state;
+        subprojectDiv.appendChild(subprojectStateLabel);
+
         // Delete button
         const deleteButtonElement = this.createDeleteButton(subproject);
         subprojectDiv.appendChild(deleteButtonElement);
