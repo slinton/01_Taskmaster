@@ -54,7 +54,9 @@ export class SummaryPage {
         const activeProjects = rootProject.getAllSubprojects(p => p.state === ProjectState.ACTIVE);
         console.log(`ActiveProjectsView: Found ${activeProjects.length} active projects`);
         activeProjects.sort((a, b) => a.getAllTaskCount(task => !task.completed) - b.getAllTaskCount(task => !task.completed));
-        activeProjects.forEach(project => {
+        
+        for (let j = 0; j < Math.min(5, activeProjects.length); j++) {
+            const project = activeProjects[j];
             // Display the active project and the number of remaining tasks
             const projectItem = document.createElement('div');
             projectItem.className = 'project-item';
@@ -83,6 +85,11 @@ export class SummaryPage {
                 projectItem.appendChild(moreTasksItem);
             }
             projectList.appendChild(projectItem);
-        });
+        }
+        if (activeProjects.length > 5) {
+            const moreProjectsItem = document.createElement('div');
+            moreProjectsItem.textContent = `...and ${activeProjects.length - 5} more projects`;
+            projectList.appendChild(moreProjectsItem);
+        }
     }
 }
